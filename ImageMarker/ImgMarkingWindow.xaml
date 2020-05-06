@@ -1,0 +1,130 @@
+﻿<Window x:Class="ImageMarker.ImgMarkingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageMarker"
+        mc:Ignorable="d"
+        Title="ImgMarkingWindow" Height="450" Width="800">
+    <Window.Resources>
+        <local:BoolToVisibility x:Key="visiConverter" />
+    </Window.Resources>
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom" Height="26">
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=CursorPosition}" />
+            </StatusBarItem>
+        </StatusBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.Background>
+                    <ImageBrush ImageSource="./TransparentBackground.png" 
+                                TileMode="Tile"     
+                                Stretch="Uniform"
+                                AlignmentY="Top" 
+                                Viewport="0,0,10,10" 
+                                ViewportUnits="Absolute" />
+                </Grid.Background>
+     
+                <Image 
+                    Name="MainImageView"
+                    Source="{Binding Path=CurrentImage}"
+                    MouseMove="MouseMoveOnImageView"
+                    MouseLeftButtonDown="MouseLeftButtonDownOnImageView"
+                    />
+                
+                <Canvas Height="{Binding ActualHeight,ElementName=MainImageView}"
+                        Width="{Binding ActualWidth,ElementName=MainImageView}">
+                    <Ellipse
+                        Width="{Binding Path=FindableOneWidthHeight}"
+                        Height="{Binding Path=FindableOneWidthHeight}"
+                        Stroke="Blue"
+                        StrokeThickness="4"
+                        Focusable="False"
+                        IsHitTestVisible="False"
+                        Canvas.Left="{Binding Path=FindableOneLeft}"
+                        Canvas.Top="{Binding Path=FindableOneTop}"
+                        Visibility="{Binding 
+                            Path=HasOneOrMoreFindables,
+                            Converter={StaticResource visiConverter}}">
+                    </Ellipse>    
+                    <Ellipse
+                        Width="50"
+                        Height="50"
+                        Stroke="ForestGreen"
+                        StrokeThickness="4"
+                        Focusable="False"
+                        IsHitTestVisible="False"
+                        Canvas.Left="85"
+                        Canvas.Top="100"
+                        Visibility="{Binding 
+                            Path=HasTwoOrMoreFindables,
+                            Converter={StaticResource visiConverter}}" />
+                    <Ellipse
+                        Width="50"
+                        Height="50"
+                        Stroke="IndianRed"
+                        StrokeThickness="4"
+                        Focusable="False"
+                        IsHitTestVisible="False"
+                        Canvas.Left="135"
+                        Canvas.Top="150"
+                        Visibility="{Binding 
+                            Path=HasThreeOrMoreFindables,
+                            Converter={StaticResource visiConverter}}" />
+                </Canvas>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="200"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Slider Grid.Row="0" 
+                            TickFrequency="1" 
+                            Minimum="0" 
+                            Maximum="4" 
+                            Name="Count" 
+                            Value="{Binding FindableEntityCount}" />
+                    <local:FindableEntity 
+                        Grid.Row="1" 
+                        BorderThickness="{Binding 
+                            Path=FirstFindableBorderThickness}" 
+                        BorderBrush="Blue"
+                        Visibility="{Binding 
+                            Path=HasOneOrMoreFindables,
+                            Converter={StaticResource visiConverter}}"/>
+                    <local:FindableEntity 
+                        Grid.Row="2" 
+                        BorderThickness="{Binding
+                            Path=SecondFindableBorderThickness}" 
+                        BorderBrush="ForestGreen"
+                        Visibility="{Binding 
+                            Path=HasTwoOrMoreFindables,
+                            Converter={StaticResource visiConverter}}"/>
+                    <local:FindableEntity
+                        Grid.Row="3" 
+                        BorderThickness="{Binding 
+                            Path=ThirdFindableBorderThickness}"
+                        BorderBrush="IndianRed"
+                        Visibility="{Binding 
+                            Path=HasThreeOrMoreFindables,
+                            Converter={StaticResource visiConverter}}"/>
+                </Grid>
+                <Button Grid.Row="1" Content="{Binding Path=NextStringButtonCaption}" Click="Button_Click_Next" />
+            </Grid>
+
+        </Grid>
+    </DockPanel>
+</Window>
