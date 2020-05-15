@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -21,28 +22,40 @@ namespace ImageMarker
     /// </summary>
     public partial class ImgMarkingWindow : Window, INotifyPropertyChanged
     {
+        private List<EnvironmentDirectory> _toBeMarkedDirItems;
+
         public ImgMarkingWindow()
         {
             DataContext = this;
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void loadImg(string imagePathAndFilename)
         {
             try
             {
-                string currentDir = Environment.CurrentDirectory;
-                DirectoryInfo directory = new DirectoryInfo(currentDir);
-
-                Uri imageFilename = new Uri(directory.FullName+"/redCircles_256_1024.jpg");
-                //Uri testUri = new Uri("bla.txt", UriKind.Relative);
-                //MessageBox.Show(imageFilename.AbsoluteUri);
+                Uri imageFilename = new Uri(imagePathAndFilename);
                 CurrentImage = new BitmapImage(imageFilename);
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            DirectoryInfo directory = null;
+            try
+            {
+                string currentDir = Environment.CurrentDirectory;
+                directory = new DirectoryInfo(currentDir);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            loadImg(directory.FullName + "/redCircles_256_1024.jpg");
         }
 
         private int findableEntityCount;
@@ -219,6 +232,12 @@ namespace ImageMarker
             CurrentImage = new BitmapImage(new Uri(pathToImage));
 
             SelectionFindable = 0;
+        }
+
+        public void SetData(List<EnvironmentDirectory> inTreeViewItems)
+        {
+            _toBeMarkedDirItems = inTreeViewItems;
+            MessageBox.Show(_toBeMarkedDirItems[0].DirName);
         }
     }
 }

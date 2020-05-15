@@ -28,7 +28,7 @@
                     ItemsSource="{Binding SubDirectories}" 
                     DataType="local:EnvironmentDirectory">
 
-                    <CheckBox IsChecked="False" Content="{Binding DirName}"/>
+                    <CheckBox IsChecked="{Binding MarkingsFound}" Content="{Binding DirName}"/>
 
                  </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>

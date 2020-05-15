@@ -1,0 +1,8 @@
+*.g.cs
+*.lref
+*.cache
+*.g.i.cs
+*.baml
+
+/ImageMarker/bin/
+/ImageMarker/obj/

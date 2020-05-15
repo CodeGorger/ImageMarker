@@ -30,6 +30,10 @@ namespace ImageMarker
         public MainWindow()
         {
             spawningDir = askForSpawningPoint();
+            if(spawningDir=="")
+            {
+                return;
+            }
             WinTitle = "Img Marker - " + spawningDir;
             initTree();
             InitializeComponent();
@@ -51,6 +55,7 @@ namespace ImageMarker
             set
             {
                 winTitle = value;
+                OnPropertyChanged(nameof(WinTitle));
             }
         }
 
@@ -92,6 +97,7 @@ namespace ImageMarker
         { 
             //ImgMarkingWindowModel m = new ImgMarkingWindowModel();
             ImgMarkingWindow instanceMarkingWindow = new ImgMarkingWindow();
+            instanceMarkingWindow.SetData(new List<EnvironmentDirectory>(Environment_TreeView_ItemsSource));
             instanceMarkingWindow.Show();
         }
 
