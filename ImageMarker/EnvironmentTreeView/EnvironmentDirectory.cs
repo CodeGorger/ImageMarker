@@ -21,6 +21,10 @@ namespace ImageMarker
         }
 
         private string path="";
+        public string PathName
+        {
+            get => path;
+        }
 
         private string dirName="";
         public string DirName

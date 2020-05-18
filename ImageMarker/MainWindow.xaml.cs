@@ -92,12 +92,29 @@ namespace ImageMarker
             WinTitle = "Img Marker - " + spawningDir;
             initTree();
         }
+        
+        
+        private List<string> treeToDirList(EnvironmentDirectory inDir)
+        {
+            List<string> ret = new List<string>();
+            if (!inDir.MarkingsFound)
+            {
+                ret.Add(inDir.PathName + "\\" + inDir.DirName);
+            }
+            foreach (EnvironmentDirectory d in inDir.SubDirectories)
+            {
+                ret.AddRange(treeToDirList(d));
+            }
+
+            return ret;
+        }
+
 
         private void Button_Click_Start(object sender, RoutedEventArgs e)
         { 
             //ImgMarkingWindowModel m = new ImgMarkingWindowModel();
             ImgMarkingWindow instanceMarkingWindow = new ImgMarkingWindow();
-            instanceMarkingWindow.SetData(new List<EnvironmentDirectory>(Environment_TreeView_ItemsSource));
+            instanceMarkingWindow.SetData(treeToDirList(Environment_TreeView_ItemsSource[0]));
             instanceMarkingWindow.Show();
         }
 

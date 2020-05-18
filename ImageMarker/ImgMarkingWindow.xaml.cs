@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.IO.Compression;
 
 namespace ImageMarker
 {
@@ -22,7 +23,17 @@ namespace ImageMarker
     /// </summary>
     public partial class ImgMarkingWindow : Window, INotifyPropertyChanged
     {
-        private List<EnvironmentDirectory> _toBeMarkedDirItems;
+        // A list of all directories/archives with images to be marked
+        private List<string> _toBeMarkedDirItems;
+
+        // A list of all images inside of a directory to be marked
+        private List<string> _toBeMarkedImages;
+
+        // The index of directory in _toBeMarkedDirItems that is currently handled
+        private int _nextDirIndex = 0;
+
+        // The index of the image in _toBeMarkedImages that is currently handled
+        private int _nextImageIndex = 0;
 
         public ImgMarkingWindow()
         {
@@ -45,17 +56,7 @@ namespace ImageMarker
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            DirectoryInfo directory = null;
-            try
-            {
-                string currentDir = Environment.CurrentDirectory;
-                directory = new DirectoryInfo(currentDir);
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-            loadImg(directory.FullName + "/redCircles_256_1024.jpg");
+
         }
 
         private int findableEntityCount;
@@ -170,10 +171,10 @@ namespace ImageMarker
 
         private void MouseMoveOnImageView(object sender, MouseEventArgs e)
         {
-
             UIElement s = e.Source as UIElement;
             Image i = ((Image)s);
             ImageSource isrc = ((ImageSource)i.Source);
+
             int xScreen = ((int)e.GetPosition(s).X);
             int yScreen = ((int)i.ActualHeight) - ((int)e.GetPosition(s).Y);
             double xRatio = ((double)xScreen) / ((Image)s).ActualWidth;
@@ -187,7 +188,7 @@ namespace ImageMarker
                 double b = findableOneCenterTop - ((int)e.GetPosition(s).Y);
                 FindableOneRadius = (int)Math.Sqrt(a * a + b * b);
             }
-        }
+        } 
         
         private int hasStickyRadius = -1;
 
@@ -227,17 +228,88 @@ namespace ImageMarker
 
         private void Button_Click_Next(object sender, RoutedEventArgs e)
         {
-            String pathToImage = System.IO.Path.GetFullPath("redCircles_256_1024.jpg");
-
-            CurrentImage = new BitmapImage(new Uri(pathToImage));
-
-            SelectionFindable = 0;
         }
 
-        public void SetData(List<EnvironmentDirectory> inTreeViewItems)
+        public void SetData(List<string> inTreeViewItems)
         {
             _toBeMarkedDirItems = inTreeViewItems;
-            MessageBox.Show(_toBeMarkedDirItems[0].DirName);
+        }
+
+        private void OnLoad(object sender, RoutedEventArgs e)
+        {
+            _nextDirIndex = 0;
+            _nextImageIndex = 0;
+            bool isLastPass = readImageList();
+            if(isLastPass)
+            {
+                return;
+            }
+
+            loadNextImageList();
+        }
+
+        // return true:  last pass
+        //        false: not last pass
+        private bool readImageList()
+        {
+            _nextImageIndex = 0;
+
+            if (0 != _nextDirIndex)
+            {
+                //TODO(Simon): Write a marking file.
+            }
+
+            if (_toBeMarkedDirItems.Count() <= _nextDirIndex)
+            {
+                MessageBox.Show("All items of the directories are marked.");
+                this.Close();
+                return true;
+            }
+
+            if (_toBeMarkedDirItems[_nextDirIndex].EndsWith(".zip"))
+            { 
+                // Archives must be unpacked -> into %temp%/ArchiveNameWithoutZipEnding
+                // 
+                string outputTempFolder = Environment.GetEnvironmentVariable("temp");
+                ZipFile.ExtractToDirectory(_toBeMarkedDirItems[_nextDirIndex], outputTempFolder);
+                string outputFinalFolder = _toBeMarkedDirItems[_nextDirIndex].Split(new string[] { ".zip" }, StringSplitOptions.None)[0];
+                outputFinalFolder = outputFinalFolder.Split(new char[] { '\\' }).Last();
+
+                string _archiveTempDir = outputTempFolder + "\\" + outputFinalFolder;
+                List<string> tmpAllFiles = new List<string>(Directory.GetFiles(_archiveTempDir,"*", SearchOption.AllDirectories));
+                _nextDirIndex++;
+                _toBeMarkedImages = new List<string>(
+                    tmpAllFiles.Where(s =>
+                    s.ToLower().EndsWith(".png") ||
+                    s.ToLower().EndsWith(".jpg") ||
+                    s.ToLower().EndsWith(".jpeg")));
+            }
+            else
+            {
+                // Easy, all images are already unpacked
+                List<string> tmpAllFiles = new List<string>(Directory.GetFiles(_toBeMarkedDirItems[_nextDirIndex]));
+                _nextDirIndex++;
+                _toBeMarkedImages = new List<string>(
+                    tmpAllFiles.Where(s =>
+                    s.ToLower().EndsWith(".png") ||
+                    s.ToLower().EndsWith(".jpg") ||
+                    s.ToLower().EndsWith(".jpeg")));
+            }
+            return false;
+        }
+        private void loadNextImageList()
+        {
+            while(_toBeMarkedImages.Count()<= _nextImageIndex)
+            {
+                bool isLastPass = readImageList();
+                if (isLastPass)
+                {
+                    return;
+                }
+            }
+            String pathToImage = System.IO.Path.GetFullPath(_toBeMarkedImages[_nextImageIndex]);
+            CurrentImage = new BitmapImage(new Uri(pathToImage));
+            SelectionFindable = 0;
         }
     }
 }
