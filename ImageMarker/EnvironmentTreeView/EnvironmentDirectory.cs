@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,15 +38,14 @@ namespace ImageMarker
             }
         }
 
-
-        private bool isFile;
-        public bool IsFile
+        private bool isArchive=false;
+        public bool IsArchive
         {
-            get => isFile;
+            get => isArchive;
             set
             {
-                isFile = value;
-                OnPropertyChanged(nameof(IsFile));
+                isArchive = value;
+                OnPropertyChanged(nameof(IsArchive));
             }
         }
         
@@ -77,13 +77,13 @@ namespace ImageMarker
             init(inPath, inName, inIsFile);
         }
 
-        private void init(string inPath, string inName, bool inIsFile)
+        private void init(string inPath, string inName, bool inIsArchive)
         {
             path = inPath;
             dirName = inName;
-            isFile = inIsFile;
+            isArchive = inIsArchive;
             subDirectories = new List<EnvironmentDirectory>();
-            if (!isFile)
+            if (!isArchive)
             {
                 //Get each file of this directory
                 string[] filesEntries = getFileList(path, dirName);
@@ -94,13 +94,15 @@ namespace ImageMarker
                     string onlyPath;
                     string onlyName;
                     splitNameAndPath(f, out onlyPath, out onlyName);
-                    if (isArchive(onlyName))
+                    
+                    if (checkIsArchive(onlyName))
                     {//its a archive file, so this must be added to the tree.
                         EnvironmentDirectory tmpArchive;
                         tmpArchive = new EnvironmentDirectory(
                             Path.Combine(path, dirName), onlyName, true);
                         tmpArchive.SearchForOwnMarkings(filesEntries);
                         subDirectories.Add(tmpArchive);
+                        
                     }
                     if (isFolderMarking(onlyName))
                     {
@@ -149,7 +151,7 @@ namespace ImageMarker
             outName = inPathSplit[inPathSplit.Count() - 1];
         }
 
-        private static bool isArchive(string fileName)
+        private static bool checkIsArchive(string fileName)
         {
             string[] inPathSplit = fileName.Split(new Char[] { '.' });
             string fileType = inPathSplit[inPathSplit.Count() - 1].ToLower();
@@ -242,6 +244,29 @@ namespace ImageMarker
                 //TODO(Simon): Log...
             }
             return subdirectoryEntries;
+        }
+        public string DirAndFileName()
+        {
+            return PathName + "\\" + DirName;
+        }
+
+        private string unzipTempDir="";
+        public void UnzipToTemp()
+        {
+            string tempFolder = Environment.GetEnvironmentVariable("temp");
+            string archiveSubFolder = DirName.Split(new string[] { ".zip" }, StringSplitOptions.None)[0];
+
+            unzipTempDir = tempFolder + "\\" + archiveSubFolder;
+            if (Directory.Exists(unzipTempDir))
+            {
+                Directory.Delete(unzipTempDir, true);
+            }
+            ZipFile.ExtractToDirectory(DirAndFileName(), tempFolder);
+            
+        }
+        public string GetUnzipDir()
+        {
+            return unzipTempDir;
         }
     }
 }

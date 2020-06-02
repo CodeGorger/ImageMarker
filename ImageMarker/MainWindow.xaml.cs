@@ -1,22 +1,11 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
+using MessageBox = System.Windows.MessageBox;
 
 namespace ImageMarker
 {
@@ -25,18 +14,53 @@ namespace ImageMarker
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private string spawningDir = "";
+        private string spawningDir = "Not Set";
+        private string aliasDirAndFile = "Not Set";
+
+        List<string> aliasEncoding;
+
+        public string SetAliasEncodingButtonText
+        {
+            get => "Set Alias Encoding\n" + "("+ aliasDirAndFile + ")";
+        }
+        public string SetSpawnButtonText
+        {
+            get => "Set Spawn\n" + "(" + spawningDir + ")";
+        }
 
         public MainWindow()
         {
-            spawningDir = askForSpawningPoint();
-            if(spawningDir=="")
-            {
-                return;
-            }
-            WinTitle = "Img Marker - " + spawningDir;
-            initTree();
             InitializeComponent();
+        }
+
+
+        private void checkForAliasesInSpawnDir()
+        {
+            string[] filesEntries = Directory.GetFiles(spawningDir);
+            bool foundEntry = false;
+            foreach(string f in filesEntries)
+            {
+                if(f == (spawningDir + "\\aliases.txt"))
+                {
+                    foundEntry = true;
+                    break;
+                }
+            }
+
+            if(foundEntry)
+            {
+                MessageBoxResult r;
+                r= MessageBox.Show(
+                    "Found aliases file at:\n" + spawningDir + "\\aliases.txt" + "\nUse it?",
+                    "Use this alias file?",
+                    (MessageBoxButton)MessageBoxButtons.YesNo);
+                if (r== MessageBoxResult.Yes)
+                {
+                    aliasDirAndFile = spawningDir + "\\aliases.txt";
+                    aliasEncoding = loadAliasFile(aliasDirAndFile);
+                    OnPropertyChanged(nameof(SetAliasEncodingButtonText));
+                }
+            }
         }
 
         private void initTree()
@@ -48,7 +72,7 @@ namespace ImageMarker
             Environment_TreeView_ItemsSource = tmpTree;
         }
 
-        private string winTitle="Img Marker";
+        private string winTitle= "Img Marker - V 1.0";
         public string WinTitle
         {
             get => winTitle;
@@ -86,35 +110,91 @@ namespace ImageMarker
             return "";
         }
 
+
+        private string askForAliasFilePoint()
+        {
+            var openFolderDialog = new CommonOpenFileDialog();
+
+            openFolderDialog.Title = "Select Alias File";
+            openFolderDialog.IsFolderPicker = false;
+
+            CommonFileDialogResult result = openFolderDialog.ShowDialog();
+
+            if (result == CommonFileDialogResult.Ok)
+            {
+                return openFolderDialog.FileName;
+            }
+            return "";
+        }
+
+
         private void Button_Click_SetSpawn(object sender, RoutedEventArgs e)
         {
-            spawningDir = askForSpawningPoint();
-            WinTitle = "Img Marker - " + spawningDir;
+            string tmpMaybePath = askForSpawningPoint();
+
+            if (tmpMaybePath == "")
+            {
+                return;
+            }
+            spawningDir = tmpMaybePath;
+            OnPropertyChanged(nameof(SetSpawnButtonText));
+
             initTree();
+
+            checkForAliasesInSpawnDir();
         }
-        
-        
-        private List<string> treeToDirList(EnvironmentDirectory inDir)
+
+        private void Button_Click_SetAliasEncoding(object sender, RoutedEventArgs e)
         {
-            List<string> ret = new List<string>();
+            string tmpMaybePath = askForAliasFilePoint();
+
+            if (tmpMaybePath == "")
+            {
+                return;
+            }
+            aliasDirAndFile = tmpMaybePath;
+            aliasEncoding = loadAliasFile(tmpMaybePath);
+            OnPropertyChanged(nameof(SetAliasEncodingButtonText));
+        }
+
+
+
+        private List<string> loadAliasFile(string tmpMaybePath)
+        {
+           return new List<string>(File.ReadAllLines(tmpMaybePath));
+        }
+
+
+        // Will return a list of string of all directories showed
+        private List<EnvironmentDirectory> dirTreeToDirList(EnvironmentDirectory inDir)
+        {
+            List<EnvironmentDirectory> ret = new List<EnvironmentDirectory>();
             if (!inDir.MarkingsFound)
             {
-                ret.Add(inDir.PathName + "\\" + inDir.DirName);
+                ret.Add(inDir);
             }
             foreach (EnvironmentDirectory d in inDir.SubDirectories)
             {
-                ret.AddRange(treeToDirList(d));
+                ret.AddRange(dirTreeToDirList(d));
             }
-
             return ret;
         }
 
 
         private void Button_Click_Start(object sender, RoutedEventArgs e)
         { 
+            if(spawningDir=="Not Set")
+            {
+                MessageBox.Show("The spawning directory must first be set.", "Set Spawn First." );
+                return;
+            }
             //ImgMarkingWindowModel m = new ImgMarkingWindowModel();
             ImgMarkingWindow instanceMarkingWindow = new ImgMarkingWindow();
-            instanceMarkingWindow.SetData(treeToDirList(Environment_TreeView_ItemsSource[0]));
+            instanceMarkingWindow.SetData(dirTreeToDirList(Environment_TreeView_ItemsSource[0]));
+            if(null!=aliasEncoding)
+            {
+                instanceMarkingWindow.SetAliasEncoding(aliasEncoding);
+            }
             instanceMarkingWindow.Show();
         }
 
@@ -129,3 +209,4 @@ namespace ImageMarker
         }
     }
 }
+

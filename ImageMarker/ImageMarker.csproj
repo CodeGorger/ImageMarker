@@ -64,7 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="FindableEntity.xaml">
+    <Page Include="ImageEntity\FindableEntityGui.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -81,16 +81,19 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BoolToVisibility.cs" />
+    <Compile Include="Circle.cs" />
+    <Compile Include="Markings.cs" />
     <Compile Include="EnvironmentTreeView\EnvironmentDirectory.cs" />
     <Compile Include="EnvironmentTreeView\ViewModelBase.cs" />
-    <Compile Include="FindableEntity.xaml.cs">
-      <DependentUpon>FindableEntity.xaml</DependentUpon>
+    <Compile Include="ImageEntity\FindableEntityGui.xaml.cs">
+      <DependentUpon>FindableEntityGui.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ImageEntity\FinableEntity.cs" />
+    <Compile Include="ImageEntity\ImageEntity.cs" />
     <Compile Include="ImgMarkingWindow.xaml.cs">
       <DependentUpon>ImgMarkingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindowModel.cs" />
-    <Content Include="ImgMarkingWindowModel.txt" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -126,5 +129,6 @@
   <ItemGroup>
     <Resource Include="TransparentBackground.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

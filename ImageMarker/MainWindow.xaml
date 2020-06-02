@@ -16,9 +16,11 @@
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" Click="Button_Click_SetSpawn">Set Spawn</Button>
-            <Button Grid.Row="1" Click="Button_Click_Start">Start</Button>
+            <Button Grid.Row="0" Click="Button_Click_SetSpawn" Content="{Binding SetSpawnButtonText}"/>
+            <Button Grid.Row="1" Click="Button_Click_SetAliasEncoding" Content="{Binding SetAliasEncodingButtonText}"/>
+            <Button Grid.Row="2" Click="Button_Click_Start">Start</Button>
         </Grid>
 
         <TreeView Grid.Column="0"
