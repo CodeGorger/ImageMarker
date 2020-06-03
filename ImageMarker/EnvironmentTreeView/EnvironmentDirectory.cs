@@ -278,7 +278,9 @@ namespace ImageMarker
             {
                 Directory.Delete(unzipTempDir, true);
             }
-            ZipFile.ExtractToDirectory(DirAndFileName(), tempFolder);
+
+            string archiveLocation = DirAndFileName();
+            ZipFile.ExtractToDirectory(archiveLocation, unzipTempDir);
             
         }
         public string GetUnzipDir()
