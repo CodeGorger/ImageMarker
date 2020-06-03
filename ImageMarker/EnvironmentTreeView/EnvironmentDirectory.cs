@@ -60,6 +60,23 @@ namespace ImageMarker
             }
         }
 
+        public string ArchiveNameWithoutExtension
+        {
+            get
+            {
+                string[] inPathSplit = dirName.Split(new Char[] { '.' });
+                string fileType = inPathSplit[inPathSplit.Count() - 1].ToLower();
+                string archiveRet = "";
+                int i = 0;
+                for (i = 0; i<inPathSplit.Count()-2; i++)
+                {
+                    archiveRet = archiveRet + inPathSplit[i] + ".";
+                }
+                archiveRet = archiveRet + inPathSplit[i];
+                return archiveRet;
+            }
+        }
+
         // example: inPath == "C:\prog\home\settings"
         // inPathSplit = {"C:","prog","home","settings"}
         // init("C:\prog\home","settings",false)

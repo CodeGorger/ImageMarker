@@ -433,7 +433,19 @@ namespace ImageMarker
         private void SerializeCurrentMarkings()
         {
             XmlSerializer formatter = new XmlSerializer(typeof(Markings));
-            string writeMarkingTo = _toBeMarkedDirItems[_nextDirIndex - 1].PathName + "\\markings.xml";
+            string writeMarkingTo;
+            if (_toBeMarkedDirItems[_nextDirIndex - 1].IsArchive)
+            {
+                writeMarkingTo = 
+                    _toBeMarkedDirItems[_nextDirIndex - 1].PathName + 
+                    "\\markings_"+
+                    _toBeMarkedDirItems[_nextDirIndex - 1].ArchiveNameWithoutExtension+
+                    ".xml";
+            }
+            else
+            {
+                writeMarkingTo = _toBeMarkedDirItems[_nextDirIndex - 1].PathName + "\\markings.xml";
+            }
             TextWriter stream = new StreamWriter(writeMarkingTo);
             formatter.Serialize(stream, _tmpMarkings);
             stream.Close();
