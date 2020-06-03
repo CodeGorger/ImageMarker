@@ -444,7 +444,11 @@ namespace ImageMarker
             }
             else
             {
-                writeMarkingTo = _toBeMarkedDirItems[_nextDirIndex - 1].PathName + "\\markings.xml";
+                writeMarkingTo =
+                    _toBeMarkedDirItems[_nextDirIndex - 1].PathName +
+                    "\\"+
+                    _toBeMarkedDirItems[_nextDirIndex - 1].DirName+
+                    "\\markings.xml";
             }
             TextWriter stream = new StreamWriter(writeMarkingTo);
             formatter.Serialize(stream, _tmpMarkings);
@@ -491,7 +495,7 @@ namespace ImageMarker
             else
             {
                 // Easy, all images are already unpacked
-                _tmpMarkings.setImageList(getImageFileList(_toBeMarkedDirItems[_nextDirIndex].DirAndFileName(), true));
+                _tmpMarkings.setImageList(getImageFileList(_toBeMarkedDirItems[_nextDirIndex].DirAndFileName(), false));
             }
             CurrentDirectoryOf = (_nextDirIndex + 1).ToString() + "/" + _toBeMarkedDirItems.Count.ToString();
             _nextDirIndex++;

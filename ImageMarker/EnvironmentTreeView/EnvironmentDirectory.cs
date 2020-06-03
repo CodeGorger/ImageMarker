@@ -227,7 +227,6 @@ namespace ImageMarker
                     MarkingsFound = true;
                     return;
                 }
-
             }
         }
 
@@ -271,7 +270,7 @@ namespace ImageMarker
         public void UnzipToTemp()
         {
             string tempFolder = Environment.GetEnvironmentVariable("temp");
-            string archiveSubFolder = DirName.Split(new string[] { ".zip" }, StringSplitOptions.None)[0];
+            string archiveSubFolder = ArchiveNameWithoutExtension;
 
             unzipTempDir = tempFolder + "\\" + archiveSubFolder;
             if (Directory.Exists(unzipTempDir))
@@ -283,6 +282,7 @@ namespace ImageMarker
             ZipFile.ExtractToDirectory(archiveLocation, unzipTempDir);
             
         }
+
         public string GetUnzipDir()
         {
             return unzipTempDir;
