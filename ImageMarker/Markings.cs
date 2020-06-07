@@ -57,6 +57,11 @@ namespace ImageMarker
             return (_nextImageIndex + 1).ToString() + "/" + _toBeMarkedImages.Count.ToString();
         }
 
+        public string CurrentFileName()
+        {
+            return _toBeMarkedImages[_nextImageIndex].FileName;
+        }
+
         public string GetNextPath()
         {
             return _toBeMarkedImages[_nextImageIndex].Path;

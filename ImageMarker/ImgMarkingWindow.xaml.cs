@@ -510,10 +510,28 @@ namespace ImageMarker
             _selectionOfNextButton = false;
             String pathToImage = System.IO.Path.GetFullPath(_tmpMarkings.GetNextPath());
 
-            CurrentImage = new BitmapImage(new Uri(pathToImage));
-            CurrentImage.CacheOption = BitmapCacheOption.OnLoad;
+            BitmapImage src = new BitmapImage();
+            src.BeginInit();
+            src.UriSource = new Uri(pathToImage);
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.EndInit();
+            CurrentImage=src;
+
             CurrentImageOf = _tmpMarkings.CurrentProgressStatus();
-            CurrentImageName = pathToImage;
+            if (_toBeMarkedDirItems[_nextDirIndex - 1].IsArchive)
+            {
+
+                CurrentImageName = 
+                    _toBeMarkedDirItems[_nextDirIndex - 1].PathName + 
+                    "\\" +
+                    _toBeMarkedDirItems[_nextDirIndex - 1].DirName +
+                    "\\" + _tmpMarkings.CurrentFileName();
+
+            }
+            else
+            {
+                CurrentImageName = pathToImage;
+            }
             _tmpMarkings.SetNextNextImageIndex();
         }
 
@@ -552,5 +570,10 @@ namespace ImageMarker
             SelectionFindable = 2;
         }
 
+
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            CurrentImage = null;
+        }
     }
 }
