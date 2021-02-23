@@ -276,12 +276,12 @@ namespace ImageMarker
                 _tmpMarkings.getCurrentImageEntity().SetCenter(SelectionFindable, c);
                 _tmpMarkings.getCurrentImageEntity().SetRadius(SelectionFindable, initialRadius);
                 FindableLeft[SelectionFindable] = _tmpMarkings.getCurrentImageEntity().GetLeft(SelectionFindable);
-                FindableTop[SelectionFindable] =  _tmpMarkings.getCurrentImageEntity().GetTop(SelectionFindable);
+                FindableTop[SelectionFindable] = _tmpMarkings.getCurrentImageEntity().GetTop(SelectionFindable);
                 FindableWidthHeight[SelectionFindable] = initialRadius * 2;
                 hasStickyRadius = true;
                 SetFindableGuiCenter(SelectionFindable, c);
 
-                _isUsedFindable[SelectionFindable]=true;
+                _isUsedFindable[SelectionFindable] = true;
                 OnPropertyChanged(nameof(IsUsedFindable));
             }
             else if (hasStickyRadius)
@@ -336,6 +336,10 @@ namespace ImageMarker
                 // There are still images left, just load the next one
                 loadNextImage();
             }
+
+            // Always start with Selection 0; and don't remember a sticky radius
+            hasStickyRadius = false; 
+            SelectionFindable = 0;
 
             //TODO(Simon): Magic number of finables
             for (int i = 0; i < 3; i++)
