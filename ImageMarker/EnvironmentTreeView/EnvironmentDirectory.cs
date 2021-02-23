@@ -221,8 +221,16 @@ namespace ImageMarker
                 {
                     continue;
                 }
-                string archiveNameInMarkingName = fileNameTokens[1].ToLower();
-                if (dirName.Split(new Char[] { '.' })[0].ToLower() == archiveNameInMarkingName)
+
+                if (onlyFile.Length < 4)
+                {   continue;   }
+                string archiveNameInMarkingName2 = onlyFile.Substring(0, onlyFile.Length - 4);
+
+                if(archiveNameInMarkingName2.Length < 9)
+                {   continue;   }
+                string archiveNameInMarkingName = archiveNameInMarkingName2.Substring(9);
+
+                if (dirName.Split(new Char[] { '.' })[0] == archiveNameInMarkingName)
                 {
                     MarkingsFound = true;
                     return;
