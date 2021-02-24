@@ -59,7 +59,7 @@ namespace ImageMarker
         }
 
         private ObservableCollection<string> _aliasEncodingSetting;
-        public  ObservableCollection<string> AliasEncodingSetting
+        public ObservableCollection<string> AliasEncodingSetting
         {
             get => _aliasEncodingSetting;
             set
@@ -143,7 +143,7 @@ namespace ImageMarker
             get => selectionFindable;
             set
             {
-                if(value<0 || value>2)
+                if (value < 0 || value > 2)
                 {
                     return;
                 }
@@ -158,7 +158,7 @@ namespace ImageMarker
         private const int slimeBorder = 2;
         private const int thickBorder = 5;
         private ObservableCollection<int> _findableBorderThickness =
-            new ObservableCollection<int>(){ slimeBorder, slimeBorder, slimeBorder };
+            new ObservableCollection<int>() { slimeBorder, slimeBorder, slimeBorder };
         //TODO(Simon): Magic 'number' for findables, 3 entries ... 
 
         public ObservableCollection<int> FindableBorderThickness
@@ -188,7 +188,7 @@ namespace ImageMarker
             }
         }
 
-        private ObservableCollection<int> findableLeft= new ObservableCollection<int>()
+        private ObservableCollection<int> findableLeft = new ObservableCollection<int>()
         { 0, 0, 0 };//TODO(Simon): Magic 'number' for findables, 3 entries ... 
         public ObservableCollection<int> FindableLeft
         {
@@ -253,7 +253,7 @@ namespace ImageMarker
         private void setMarkingsNull()
         {
             //TODO(Simon): Magic 'number' for findables, 3 entries ... 
-            FindableLeft = new ObservableCollection<int>(){ 0, 0, 0 };
+            FindableLeft = new ObservableCollection<int>() { 0, 0, 0 };
             FindableTop = new ObservableCollection<int>() { 0, 0, 0 };
             FindableWidthHeight = new ObservableCollection<double>() { 0, 0, 0 };
         }
@@ -289,7 +289,7 @@ namespace ImageMarker
                 hasStickyRadius = false;
                 SelectionFindable++;
                 //TODO(Simon): Magic number for findables again ...
-                if (SelectionFindable>=3) 
+                if (SelectionFindable >= 3)
                 {
                     SelectionFindable = 0;
                     _selectionOfNextButton = true;
@@ -314,7 +314,7 @@ namespace ImageMarker
         private void Button_Click_Next(object sender, RoutedEventArgs e)
         {
             //TODO(Simon): Magic number of finables
-            for(int i=0;i<3;i++)
+            for (int i = 0; i < 3; i++)
             {
                 _tmpMarkings.getCurrentImageEntity().SetIsUsed(i, _isUsedFindable[i]);
                 _tmpMarkings.getCurrentImageEntity().SetAlias(i, _aliasSelection[i]);
@@ -324,7 +324,7 @@ namespace ImageMarker
                     _tmpMarkings.getCurrentImageEntity().SetRadius(i, 0);
                 }
             }
-            
+
             if (_tmpMarkings.IsEndOfListReached())
             {
                 // End of the list was reached, loading a 
@@ -338,7 +338,7 @@ namespace ImageMarker
             }
 
             // Always start with Selection 0; and don't remember a sticky radius
-            hasStickyRadius = false; 
+            hasStickyRadius = false;
             SelectionFindable = 0;
 
             //TODO(Simon): Magic number of finables
@@ -385,6 +385,7 @@ namespace ImageMarker
             return ret;
         }
 
+
         private static List<ImageEntity.ImageEntity> getImageFileList(
             string inDirectory,
             bool inRecursive)
@@ -421,7 +422,7 @@ namespace ImageMarker
 
             // Basically, while there are directories without images. (or in other words)
             // While the images in the to-be-marked-list is done with it
-            while (_tmpMarkings.IsEndOfListReached()) 
+            while (_tmpMarkings.IsEndOfListReached())
             {
                 isLastPass = readDirectoryImageList();
                 if (isLastPass)
@@ -440,23 +441,36 @@ namespace ImageMarker
             string writeMarkingTo;
             if (_toBeMarkedDirItems[_nextDirIndex - 1].IsArchive)
             {
-                writeMarkingTo = 
-                    _toBeMarkedDirItems[_nextDirIndex - 1].PathName + 
-                    "\\markings_"+
-                    _toBeMarkedDirItems[_nextDirIndex - 1].ArchiveNameWithoutExtension+
+                writeMarkingTo =
+                    _toBeMarkedDirItems[_nextDirIndex - 1].PathName +
+                    "\\markings_" +
+                    _toBeMarkedDirItems[_nextDirIndex - 1].ArchiveNameWithoutExtension +
                     ".xml";
             }
             else
             {
                 writeMarkingTo =
                     _toBeMarkedDirItems[_nextDirIndex - 1].PathName +
-                    "\\"+
-                    _toBeMarkedDirItems[_nextDirIndex - 1].DirName+
+                    "\\" +
+                    _toBeMarkedDirItems[_nextDirIndex - 1].DirName +
                     "\\markings.xml";
             }
             TextWriter stream = new StreamWriter(writeMarkingTo);
             formatter.Serialize(stream, _tmpMarkings);
             stream.Close();
+        }
+
+
+        private void DeserializeNextMarkings()
+        {
+            string readMarkingsFrom = _toBeMarkedDirItems[_nextDirIndex].MarkingsAt;
+
+            XmlSerializer serializer = new XmlSerializer(typeof(Markings));
+            FileStream fs = new FileStream(readMarkingsFrom, FileMode.OpenOrCreate);
+            TextReader reader = new StreamReader(fs);
+
+            _tmpMarkings = (Markings)serializer.Deserialize(reader);
+
         }
 
 
@@ -493,12 +507,19 @@ namespace ImageMarker
                 // 
                 _toBeMarkedDirItems[_nextDirIndex].UnzipToTemp();
                 string unzipdir = _toBeMarkedDirItems[_nextDirIndex].GetUnzipDir();
-
+                if (_toBeMarkedDirItems[_nextDirIndex].MarkingsFound)
+                {
+                    DeserializeNextMarkings();
+                }
                 _tmpMarkings.setImageList(getImageFileList(unzipdir, true));
             }
             else
             {
                 // Easy, all images are already unpacked
+                if (_toBeMarkedDirItems[_nextDirIndex].MarkingsFound)
+                {
+                    DeserializeNextMarkings();
+                }
                 _tmpMarkings.setImageList(getImageFileList(_toBeMarkedDirItems[_nextDirIndex].DirAndFileName(), false));
             }
             CurrentDirectoryOf = (_nextDirIndex + 1).ToString() + "/" + _toBeMarkedDirItems.Count.ToString();

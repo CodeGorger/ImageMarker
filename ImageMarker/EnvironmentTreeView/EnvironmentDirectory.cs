@@ -21,6 +21,17 @@ namespace ImageMarker
             }
         }
 
+        private string markingsAt = "";
+        public string MarkingsAt
+        {
+            get => markingsAt;
+            set
+            {
+                markingsAt = value;
+                OnPropertyChanged(nameof(MarkingsAt));
+            }
+        }
+
         private string path="";
         public string PathName
         {
@@ -127,6 +138,7 @@ namespace ImageMarker
                         // These kind of markings will only exactly 
                         // for the images in this folder
                         MarkingsFound = true;
+                        MarkingsAt = f;
                     }
                 }
 
@@ -233,6 +245,7 @@ namespace ImageMarker
                 if (dirName.Split(new Char[] { '.' })[0] == archiveNameInMarkingName)
                 {
                     MarkingsFound = true;
+                    MarkingsAt = f;
                     return;
                 }
             }
