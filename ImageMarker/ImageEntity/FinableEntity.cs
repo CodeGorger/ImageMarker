@@ -28,7 +28,7 @@ namespace ImageMarker.ImageEntity
         }
         
         private bool _used;
-        [XmlIgnore]
+        [XmlAttribute("IsUsed")]
         public bool IsUsed
         {
             get => _used;

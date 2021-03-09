@@ -1,0 +1,68 @@
+﻿<Window x:Class="ImageMarker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"  
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageMarker"
+        mc:Ignorable="d"
+        Title="{Binding WinTitle}" Height="450" Width="800">
+    <Window.Resources>
+        <!--<local:MainWindowViewModel x:Key="vm" />-->
+        <local:BoolToVisibility x:Key="visiConverter" />
+    </Window.Resources>
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="1" >
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" 
+                    Command="{Binding SetMainPathCommand}" 
+                    Content="{Binding SetSpawnButtonText}"/>
+            <Button Grid.Row="1" 
+                    Command="{Binding SetAliasesCommand}" 
+                    Content="{Binding SetAliasEncodingButtonText}"/>
+            <Button Grid.Row="2" 
+                    Command="{Binding StartMarkingCommand}">Start</Button>
+
+            <!--<Button Grid.Row="2" Click="Button_Click_Start">Start</Button>-->
+        </Grid>
+
+        <TreeView Grid.Column="0"
+                  ItemsSource="{Binding Path=Environment_TreeView_ItemsSource}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate
+                    ItemsSource="{Binding SubDirectories}" 
+                    DataType="local:EnvironmentDirectory">
+                    <StackPanel Orientation="Horizontal">
+                        <Image 
+                            Width="16" Height="16"
+                            Source="/Images/markerYes.png" 
+                            Visibility="{Binding 
+                                MarkingsFileFound, 
+                                Converter={StaticResource visiConverter}}" />
+                        <Image 
+                            Width="16" Height="16"
+                            Source="/Images/markerNo.png" 
+                            Visibility="{Binding
+                                MarkingsFileNotFound, 
+                                Converter={StaticResource visiConverter}}" />
+                        <CheckBox 
+                            IsChecked="{Binding MarkingRoutineWillRunOn}" 
+                            Content="{Binding LastDirOrArchiveName}"/>
+
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <!--<Button Grid.Column="1" Click="Button_Click">Start Marking</Button>-->
+    </Grid>
+</Window>

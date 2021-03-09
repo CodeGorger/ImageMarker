@@ -15,15 +15,16 @@ namespace ImageMarker.ImageEntity
         {
             fileName = "";
             directory = "";
+            _markings = new List<FindableEntity>();
         }
         public ImageEntity(string inFullPath, int inMarkingsCount)
         {
             fileName = inFullPath.Split(new string[] { "\\" }, StringSplitOptions.None).Last();
             directory = inFullPath.Replace("\\"+fileName,"");
-            Markings=new List<FindableEntity>();
+            _markings = new List<FindableEntity>();
             for (int i = 0; i < inMarkingsCount; i++)
             {
-                Markings.Add(new FindableEntity());
+                _markings.Add(new FindableEntity());
             }
         }
 
@@ -57,18 +58,15 @@ namespace ImageMarker.ImageEntity
         [XmlElement(ElementName = "Entity")]
         public List<FindableEntity> UsedMarkings
         {
-            get
-            {
-                List<FindableEntity> tmp;
-                tmp=(List<FindableEntity>)Markings.Where(s => s.IsUsed).ToList();
-                return tmp;
-            }
+            get => _markings;
             set
-            { }
+            {
+                _markings = value;
+            }
         }
 
         [XmlIgnore]
-        public List<FindableEntity> Markings;
+        private List<FindableEntity> _markings;
 
 
         [XmlAttribute("EntityCount")]
@@ -76,12 +74,13 @@ namespace ImageMarker.ImageEntity
         {
             get
             {
-                int ret = 0;
-                for(int i=0; i< Markings.Count; i++)
-                {
-                    ret += (Markings[i].IsUsed ? 1 : 0);
-                }
-                return ret;
+                //int ret = 0;
+                //for(int i=0; i< _markings.Count; i++)
+                //{
+                //    ret += (_markings[i].IsUsed ? 1 : 0);
+                //}
+                //return ret;
+                return 3;
             }
             set
             {
@@ -91,49 +90,59 @@ namespace ImageMarker.ImageEntity
 
         public Point GetCenter(int inMarkingId)
         {
-            return Markings[inMarkingId].FeaturePosition.Center;
+            return _markings[inMarkingId].FeaturePosition.Center;
         }
 
         public void SetCenter(int inMarkingId, Point inCenter)
         {
-            Markings[inMarkingId].FeaturePosition.Center=inCenter;
+            _markings[inMarkingId].FeaturePosition.Center=inCenter;
         }
 
 
         public void SetIsUsed(int inMarkingId, bool inIsUsed)
         {
-            Markings[inMarkingId].IsUsed = inIsUsed;
+            _markings[inMarkingId].IsUsed = inIsUsed;
         }
 
         public void SetAlias(int inMarkingId, int inAlias)
         {
-            Markings[inMarkingId].Alias = inAlias;
+            _markings[inMarkingId].Alias = inAlias;
         }
 
-
-        public int GetLeft(int inMarkingId)
+        public void SetPath(ImageEntity inOtherPath)
         {
-            int x_pos = ((int)Markings[inMarkingId].FeaturePosition.Center.X);
-            int radius = ((int)Markings[inMarkingId].FeaturePosition.Radius);
-            return x_pos - radius;
+            directory = inOtherPath.directory;
+            fileName = inOtherPath.fileName;
         }
 
-        public int GetTop(int inMarkingId)
-        {
-            int y_pos = ((int)Markings[inMarkingId].FeaturePosition.Center.Y);
-            int radius = ((int)Markings[inMarkingId].FeaturePosition.Radius);
-            return y_pos - radius;
-        }
+        // TODO(Simon): Probably removable
+        //public int GetLeft(int inMarkingId)
+        //{
+        //    int x_pos = ((int)_markings[inMarkingId].FeaturePosition.Center.X);
+        //    int radius = ((int)_markings[inMarkingId].FeaturePosition.Radius);
+        //    return x_pos - radius;
+        //}
 
-        public int DistanceToCenter(int inMarkingId, Point inPos)
-        {
-            double dx = (((int)Markings[inMarkingId].FeaturePosition.Center.X) - ((int)inPos.X));
-            double dy = (((int)Markings[inMarkingId].FeaturePosition.Center.Y) - ((int)inPos.Y));
-            return (int)Math.Sqrt(dx * dx + dy * dy);
-        }
-        public void SetRadius(int inMarkingId, double inRadius)
-        {
-            Markings[inMarkingId].FeaturePosition.Radius = inRadius;
-        }
+        // TODO(Simon): Probably removable
+        //public int GetTop(int inMarkingId)
+        //{
+        //    int y_pos = ((int)_markings[inMarkingId].FeaturePosition.Center.Y);
+        //    int radius = ((int)_markings[inMarkingId].FeaturePosition.Radius);
+        //    return y_pos - radius;
+        //}
+
+        // TODO(Simon): Probably removable
+        //public int DistanceToCenter(int inMarkingId, Point inPos)
+        //{
+        //    double dx = (((int)_markings[inMarkingId].FeaturePosition.Center.X) - ((int)inPos.X));
+        //    double dy = (((int)_markings[inMarkingId].FeaturePosition.Center.Y) - ((int)inPos.Y));
+        //    return (int)Math.Sqrt(dx * dx + dy * dy);
+        //}
+
+        // TODO(Simon): Probably removable
+        //public void SetRadius(int inMarkingId, double inRadius)
+        //{
+        //    _markings[inMarkingId].FeaturePosition.Radius = inRadius;
+        //}
     }
 }

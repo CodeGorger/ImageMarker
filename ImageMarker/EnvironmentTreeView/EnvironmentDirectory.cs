@@ -8,86 +8,10 @@ using System.Threading.Tasks;
 
 namespace ImageMarker
 {
-    public class EnvironmentDirectory : ViewModelBase
+    // A tree element of the main directory structure.
+    // It can be a node or a leaf
+    public partial class EnvironmentDirectory : ViewModelBase
     {
-        private bool markingsFound = false;
-        public bool MarkingsFound
-        {
-            get => markingsFound;
-            set
-            {
-                markingsFound = value;
-                OnPropertyChanged(nameof(MarkingsFound));
-            }
-        }
-
-        private string markingsAt = "";
-        public string MarkingsAt
-        {
-            get => markingsAt;
-            set
-            {
-                markingsAt = value;
-                OnPropertyChanged(nameof(MarkingsAt));
-            }
-        }
-
-        private string path="";
-        public string PathName
-        {
-            get => path;
-        }
-
-        private string dirName="";
-        public string DirName
-        {
-            get => dirName;
-            set
-            {
-                dirName = value;
-                OnPropertyChanged(nameof(DirName));
-            }
-        }
-
-        private bool isArchive=false;
-        public bool IsArchive
-        {
-            get => isArchive;
-            set
-            {
-                isArchive = value;
-                OnPropertyChanged(nameof(IsArchive));
-            }
-        }
-        
-        private List<EnvironmentDirectory> subDirectories;
-        public List<EnvironmentDirectory> SubDirectories
-        {
-            get => subDirectories;
-            set
-            {
-                subDirectories = value;
-                OnPropertyChanged(nameof(SubDirectories));
-            }
-        }
-
-        public string ArchiveNameWithoutExtension
-        {
-            get
-            {
-                string[] inPathSplit = dirName.Split(new Char[] { '.' });
-                string fileType = inPathSplit[inPathSplit.Count() - 1].ToLower();
-                string archiveRet = "";
-                int i = 0;
-                for (i = 0; i<inPathSplit.Count()-2; i++)
-                {
-                    archiveRet = archiveRet + inPathSplit[i] + ".";
-                }
-                archiveRet = archiveRet + inPathSplit[i];
-                return archiveRet;
-            }
-        }
-
         // example: inPath == "C:\prog\home\settings"
         // inPathSplit = {"C:","prog","home","settings"}
         // init("C:\prog\home","settings",false)
@@ -96,7 +20,7 @@ namespace ImageMarker
         {
             string onlyPath;
             string onlyName;
-            splitNameAndPath(inPath, out onlyPath, out onlyName);
+            StaticHelper.SplitNameAndPath(inPath, out onlyPath, out onlyName);
             init(onlyPath, onlyName, false);
         }
 
@@ -105,112 +29,95 @@ namespace ImageMarker
             init(inPath, inName, inIsFile);
         }
 
+
+        public string GetFullPathToMarkingsFile()
+        {
+            return _fullPathToMarkingsFile;
+        }
+
         private void init(string inPath, string inName, bool inIsArchive)
         {
-            path = inPath;
-            dirName = inName;
-            isArchive = inIsArchive;
-            subDirectories = new List<EnvironmentDirectory>();
-            if (!isArchive)
+            _pathName = inPath;
+            _lastDirOrArchiveName  = inName;
+            _isArchive = inIsArchive;
+            _subDirectories = new List<EnvironmentDirectory>();
+            if (_isArchive)
+            {
+                _fullPathToMarkingsFile = 
+                    _pathName +
+                    "\\markings_" + 
+                    inName.Substring(0, inName.Length-4) +
+                    ".xml";
+            }
+            else
+            {
+                _fullPathToMarkingsFile = _pathName + "\\" + _lastDirOrArchiveName + "\\markings.xml";
+            }
+            // If it is an archive, there is no reason to search
+            // subdirectories.
+            // For sub directories, they must be searched for sub sub dirs
+            // and archives...
+            if (!_isArchive)
             {
                 //Get each file of this directory
-                string[] filesEntries = getFileList(path, dirName);
+                string[] filesEntries = getFileList(
+                    _pathName, _lastDirOrArchiveName );
 
                 //Check each file of this directory
                 foreach (string f in filesEntries)
                 {
                     string onlyPath;
                     string onlyName;
-                    splitNameAndPath(f, out onlyPath, out onlyName);
+                    StaticHelper.SplitNameAndPath(f, out onlyPath, out onlyName);
                     
-                    if (checkIsArchive(onlyName))
+                    if (StaticHelper.CheckIsArchive(onlyName))
                     {//its a archive file, so this must be added to the tree.
                         EnvironmentDirectory tmpArchive;
                         tmpArchive = new EnvironmentDirectory(
-                            Path.Combine(path, dirName), onlyName, true);
-                        tmpArchive.SearchForOwnMarkings(filesEntries);
-                        subDirectories.Add(tmpArchive);
+                            Path.Combine(_pathName, _lastDirOrArchiveName ), 
+                            onlyName, true);
+                        tmpArchive.searchForOwnMarkings(filesEntries);
+                        _subDirectories.Add(tmpArchive);
                         
                     }
-                    if (isFolderMarking(onlyName))
+                    if (StaticHelper.IsFolderMarking(onlyName))
                     {
                         // its a folder marking information.
                         // These kind of markings will only exactly 
                         // for the images in this folder
-                        MarkingsFound = true;
-                        MarkingsAt = f;
+                        _markingsFileFound = true;
+                        _markingRoutineWillRunOn = false;
                     }
                 }
 
+
+
                 //Get each sub directory of this directory
-                string[] subdirectoryEntries = getDirList(path, dirName);
+                string[] subdirectoryEntries = getDirList(_pathName, _lastDirOrArchiveName );
 
                 //Recursive adding entry for each sub dir
                 foreach (string d in subdirectoryEntries)
                 {
                     string onlyPath;
                     string onlyName;
-                    splitNameAndPath(d, out onlyPath, out onlyName);
-                    subDirectories.Add(
+                    StaticHelper.SplitNameAndPath(d, out onlyPath, out onlyName);
+                    _subDirectories.Add(
                         new EnvironmentDirectory(
-                            Path.Combine(path, dirName), 
+                            Path.Combine(_pathName, _lastDirOrArchiveName ), 
                             onlyName, 
                             false));
                 }
             }
         }
 
-        private static void splitNameAndPath(string inPathAndName, out string outPath, out string outName)
-        {
-            if(inPathAndName=="")
-            {
-                outPath = "";
-                outName = "";
-                return;
-            }
-            string tmpPath = "";
-            string[] inPathSplit = inPathAndName.Split(new Char[] { '\\' });
-            for (int i = 0; i <= inPathSplit.Count() - 3; i++)
-            {
-                tmpPath += inPathSplit[i];
-                tmpPath += "\\";
-            }
-            tmpPath += inPathSplit[inPathSplit.Count() - 2];
-            outPath = tmpPath;
-            outName = inPathSplit[inPathSplit.Count() - 1];
-        }
 
-        private static bool checkIsArchive(string fileName)
-        {
-            string[] inPathSplit = fileName.Split(new Char[] { '.' });
-            string fileType = inPathSplit[inPathSplit.Count() - 1].ToLower();
-            if (fileType == "zip")
-            {
-                return true;
-            }
-            if (fileType == "rar")
-            {
-                return true;
-            }
-            if (fileType == "7z")
-            {
-                return true;
-            }
-            return false;
-        }
-
-        // if its folder marking, the filename is markings.xml
-        private static bool isFolderMarking(string fileName)
-        {
-            return (fileName == "markings.xml");
-        }
 
         // If a archive was found during the treebuilding process,
         // somehow an according markings file must be linked
         // for archives its not that easy, because the file is not located in it
         // but next to it.
         // if its archive marking, the filename is markings_archivename.xml
-        private void SearchForOwnMarkings(string[] inFilesEntries)
+        private void searchForOwnMarkings(string[] inFilesEntries)
         {
             // MarkingsFound=true or false?
             // Check all entries in inFilesEntries
@@ -221,7 +128,7 @@ namespace ImageMarker
             {
                 string onlyFile;
                 string onlyPath;
-                splitNameAndPath(f, out onlyPath, out onlyFile);
+                StaticHelper.SplitNameAndPath(f, out onlyPath, out onlyFile);
                 string[] fileNameTokens = onlyFile.Split(new Char[] { '.', '_' });
                 string fileType = fileNameTokens[fileNameTokens.Count() - 1].ToLower();
                 if (fileType != "xml")
@@ -242,10 +149,10 @@ namespace ImageMarker
                 {   continue;   }
                 string archiveNameInMarkingName = archiveNameInMarkingName2.Substring(9);
 
-                if (dirName.Split(new Char[] { '.' })[0] == archiveNameInMarkingName)
+                if (_lastDirOrArchiveName .Split(new Char[] { '.' })[0] == archiveNameInMarkingName)
                 {
-                    MarkingsFound = true;
-                    MarkingsAt = f;
+                    _markingsFileFound = true;
+                    _markingRoutineWillRunOn = false;
                     return;
                 }
             }
@@ -282,31 +189,31 @@ namespace ImageMarker
             }
             return subdirectoryEntries;
         }
-        public string DirAndFileName()
-        {
-            return PathName + "\\" + DirName;
-        }
 
-        private string unzipTempDir="";
-        public void UnzipToTemp()
-        {
-            string tempFolder = Environment.GetEnvironmentVariable("temp");
-            string archiveSubFolder = ArchiveNameWithoutExtension;
+        //public string DirAndFileName()
+        //{
+        //    return PathName + "\\" + LastDirOrArchiveName;
+        //}
 
-            unzipTempDir = tempFolder + "\\" + archiveSubFolder;
-            if (Directory.Exists(unzipTempDir))
-            {
-                Directory.Delete(unzipTempDir, true);
-            }
 
-            string archiveLocation = DirAndFileName();
-            ZipFile.ExtractToDirectory(archiveLocation, unzipTempDir);
-            
-        }
+        //public string GetArchiveNameWithoutExtension()
+        //{
+        //    string[] inPathSplit = _lastDirOrArchiveName.Split(new Char[] { '.' });
+        //    string fileType = inPathSplit[inPathSplit.Count() - 1].ToLower();
+        //    string archiveRet = "";
+        //    int i = 0;
+        //    for (i = 0; i < inPathSplit.Count() - 2; i++)
+        //    {
+        //        archiveRet = archiveRet + inPathSplit[i] + ".";
+        //    }
+        //    archiveRet = archiveRet + inPathSplit[i];
+        //    return archiveRet;
+        //}
 
-        public string GetUnzipDir()
-        {
-            return unzipTempDir;
-        }
+
+        //public string GetUnzipDir()
+        //{
+        //    return unzipTempDir;
+        //}
     }
 }

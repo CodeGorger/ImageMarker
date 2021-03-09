@@ -14,6 +14,21 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,6 +59,9 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -67,15 +85,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command.cs" />
+    <Compile Include="Dtos\AliasInformationDto.cs" />
+    <Compile Include="Dtos\BitmapImageSuccessDto.cs" />
+    <Compile Include="EnvironmentTreeView\EnvironmentDirectory.Properties.cs" />
+    <Compile Include="Dtos\MainPathSetDto.cs" />
+    <Compile Include="GlobalSetMarkingsManager.cs" />
+    <Compile Include="ImgMarkingWindow\ImgMarkingWindowViewModel.Properties.cs" />
+    <Compile Include="ImgMarkingWindow\ImgMarkingWindowViewModel.cs" />
+    <Compile Include="MainWindow\MainWindowViewModel.Properties.cs" />
+    <Compile Include="MainWindow\MainWindowViewModel.Commands.cs" />
+    <Compile Include="MainWindow\MainWindowViewModel.cs" />
+    <Compile Include="MarkingsManager\MarkingsFileManager.cs" />
+    <Compile Include="SetMarkingsContainer.cs" />
+    <Compile Include="StaticHelper.cs" />
     <Page Include="ImageEntity\FindableEntityGui.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ImgMarkingWindow.xaml">
+    <Page Include="ImgMarkingWindow\ImgMarkingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="MainWindow\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -85,19 +117,18 @@
     </Compile>
     <Compile Include="BoolToVisibility.cs" />
     <Compile Include="Circle.cs" />
-    <Compile Include="Markings.cs" />
+    <Compile Include="SetMarkings.cs" />
     <Compile Include="EnvironmentTreeView\EnvironmentDirectory.cs" />
-    <Compile Include="EnvironmentTreeView\ViewModelBase.cs" />
+    <Compile Include="ViewModelBase.cs" />
     <Compile Include="ImageEntity\FindableEntityGui.xaml.cs">
       <DependentUpon>FindableEntityGui.xaml</DependentUpon>
     </Compile>
     <Compile Include="ImageEntity\FinableEntity.cs" />
     <Compile Include="ImageEntity\ImageEntity.cs" />
-    <Compile Include="ImgMarkingWindow.xaml.cs">
+    <Compile Include="ImgMarkingWindow\ImgMarkingWindow.xaml.cs">
       <DependentUpon>ImgMarkingWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindowModel.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="MainWindow\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -119,6 +150,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -130,10 +162,27 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="TransparentBackground.png" />
+    <Resource Include="ImgMarkerIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="ImgMarkerIcon.ico" />
+    <Resource Include="Images\Icon.png" />
+    <Resource Include="Images\TransparentBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\markerNo.png" />
+    <Resource Include="Images\markerYes.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

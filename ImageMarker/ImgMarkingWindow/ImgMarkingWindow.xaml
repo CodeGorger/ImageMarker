@@ -37,7 +37,7 @@
 
             <Grid Grid.Column="0">
                 <Grid.Background>
-                    <ImageBrush ImageSource="./TransparentBackground.png" 
+                    <ImageBrush ImageSource="./../Images/TransparentBackground.png" 
                                 TileMode="Tile"     
                                 Stretch="Uniform"
                                 AlignmentY="Top" 
@@ -62,10 +62,7 @@
                         Focusable="False"
                         IsHitTestVisible="False"
                         Canvas.Left="{Binding Path=FindableLeft[0]}"
-                        Canvas.Top="{Binding Path=FindableTop[0]}" 
-						Visibility="{Binding 
-                            Path=IsUsedFindable[0],
-                            Converter={StaticResource visiConverter}}" />
+                        Canvas.Top="{Binding Path=FindableTop[0]}"  />
 					<Ellipse
                         Width="{Binding Path=FindableWidthHeight[1]}"
                         Height="{Binding Path=FindableWidthHeight[1]}"
@@ -74,10 +71,7 @@
                         Focusable="False"
                         IsHitTestVisible="False"
                         Canvas.Left="{Binding Path=FindableLeft[1]}"
-                        Canvas.Top="{Binding Path=FindableTop[1]}"
-						Visibility="{Binding 
-                            Path=IsUsedFindable[1],
-                            Converter={StaticResource visiConverter}}" />
+                        Canvas.Top="{Binding Path=FindableTop[1]}"/>
 					<Ellipse
                         Width="{Binding Path=FindableWidthHeight[2]}"
                         Height="{Binding Path=FindableWidthHeight[2]}"
@@ -86,10 +80,7 @@
                         Focusable="False"
                         IsHitTestVisible="False"
                         Canvas.Left="{Binding Path=FindableLeft[2]}"
-                        Canvas.Top="{Binding Path=FindableTop[2]}"
-						Visibility="{Binding 
-                            Path=IsUsedFindable[2],
-                            Converter={StaticResource visiConverter}}" />
+                        Canvas.Top="{Binding Path=FindableTop[2]}" />
                 </Canvas>
             </Grid>
             <Grid Grid.Column="1">

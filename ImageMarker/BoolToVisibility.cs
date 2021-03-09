@@ -19,7 +19,7 @@ namespace ImageMarker
             }
             else
             {
-                return Visibility.Hidden;
+                return Visibility.Collapsed;
             }
         }
 
