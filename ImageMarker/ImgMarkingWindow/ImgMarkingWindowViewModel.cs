@@ -121,8 +121,8 @@ namespace ImageMarker
 
         public void WriteCursorPositionStatus(Point inPos)
         {
-            //Point filePos = _getFilePointFromUIPoint(inPos);
-            //CursorPosition = "( x:" + ((int)filePos.X) + " / y:" + ((int)filePos.Y) + " )";
+            Point filePos = _getFilePointFromUIPoint(inPos);
+            CursorPosition = "( x:" + ((int)filePos.X) + " / y:" + ((int)filePos.Y) + " )";
         }
 
 
