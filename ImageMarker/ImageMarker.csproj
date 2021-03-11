@@ -97,6 +97,10 @@
     <Compile Include="MainWindow\MainWindowViewModel.Commands.cs" />
     <Compile Include="MainWindow\MainWindowViewModel.cs" />
     <Compile Include="MarkingsManager\MarkingsFileManager.cs" />
+    <Compile Include="PushBinding\FreezableBinding.cs" />
+    <Compile Include="PushBinding\PushBinding.cs" />
+    <Compile Include="PushBinding\PushBindingCollection.cs" />
+    <Compile Include="PushBinding\PushBindingManager.cs" />
     <Compile Include="SetMarkingsContainer.cs" />
     <Compile Include="StaticHelper.cs" />
     <Page Include="ImageEntity\FindableEntityGui.xaml">

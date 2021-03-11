@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace ImageMarker.Dtos
@@ -18,17 +19,20 @@ namespace ImageMarker.Dtos
             DirNoOf = "";
             ImageName = "";
             LastDirFinished = false;
-            KnownMarkings = 
-                new ObservableCollection<bool>()
+            KnownMarkings =
+                new List<bool>()
             { false, false, false };
-            FindableLeft = 
-                new ObservableCollection<double>()
+
+            FileImageCenters =
+                new List<Point>()
+            { new Point(0, 0), new Point(0, 0), new Point(0, 0) };
+
+            FileImageRadiuses =
+                new List<double>()
             { 0, 0, 0 };
-            FindableTop = 
-                new ObservableCollection<double>()
-            { 0, 0, 0 };
-            FindableWidthHeight =
-                new ObservableCollection<double>()
+
+            Aliases =
+                new List<int>()
             { 0, 0, 0 };
         }
         public BitmapImage Img;
@@ -38,9 +42,9 @@ namespace ImageMarker.Dtos
         public string ImageName;
         public bool LastDirFinished;
 
-        public ObservableCollection<bool> KnownMarkings;
-        public ObservableCollection<double> FindableLeft;
-        public ObservableCollection<double> FindableTop;
-        public ObservableCollection<double> FindableWidthHeight;
+        public List<bool> KnownMarkings;
+        public List<Point> FileImageCenters;
+        public List<double> FileImageRadiuses;
+        public List<int> Aliases;
     }
 }

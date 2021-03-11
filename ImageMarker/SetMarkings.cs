@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 
@@ -91,18 +92,21 @@ namespace ImageMarker
         }
 
         private void _copyMarkings(
-            BitmapImageSuccessDto inDestDto,
+            ref BitmapImageSuccessDto inDestDto,
             int inId)
         {
+            inDestDto.KnownMarkings[inId] =
+                _toBeMarkedImages[_nextImageIndex].UsedMarkings[inId].IsUsed;
             if (_toBeMarkedImages[_nextImageIndex].UsedMarkings[inId].IsUsed)
             {
-                inDestDto.FindableLeft[inId] =
+                inDestDto.FileImageCenters[inId] = new Point(
                     _toBeMarkedImages[_nextImageIndex].
-                    UsedMarkings[inId].FeaturePosition.x;
-                inDestDto.FindableTop[inId] =
+                        UsedMarkings[inId].FeaturePosition.x,
                     _toBeMarkedImages[_nextImageIndex].
-                    UsedMarkings[inId].FeaturePosition.y;
-                inDestDto.FindableWidthHeight[inId] =
+                        UsedMarkings[inId].FeaturePosition.y
+                    );
+                    
+                inDestDto.FileImageRadiuses[inId] =
                     _toBeMarkedImages[_nextImageIndex].
                     UsedMarkings[inId].FeaturePosition.Radius;
             }
@@ -116,9 +120,9 @@ namespace ImageMarker
                 return ret;
             }
 
-            _copyMarkings(ret, 0);
-            _copyMarkings(ret, 1);
-            _copyMarkings(ret, 2);
+            _copyMarkings(ref ret, 0);
+            _copyMarkings(ref ret, 1);
+            _copyMarkings(ref ret, 2);
             
             ret.Img = _loadTheImage();
             ret.ImgNoOf =   (_nextImageIndex + 1) + 
@@ -133,11 +137,36 @@ namespace ImageMarker
         }
 
 
+        public BitmapImageSuccessDto GetCurrentFileImgMarkingsDto()
+        {
+            _nextImageIndex--;
+            BitmapImageSuccessDto ret = new BitmapImageSuccessDto();
+            if (!HasNextImage())
+            {
+                return ret;
+            }
+
+            _copyMarkings(ref ret, 0);
+            _copyMarkings(ref ret, 1);
+            _copyMarkings(ref ret, 2);
+
+            ret.Img = null;
+            ret.ImgNoOf = (_nextImageIndex + 1) +
+                            " / " +
+                            _toBeMarkedImages.Count;
+            ret.ImageName = _toBeMarkedImages[_nextImageIndex].FileName;
+
+            ret.Success = true;
+            _nextImageIndex++;
+
+            return ret;
+        }
+
+
         public void StoreMarkings(
             ObservableCollection<bool> inIsUsedFindable,
-            ObservableCollection<double> inFindableLeft,
-            ObservableCollection<double> inFindableTop,
-            ObservableCollection<double> inFindableWidthHeight,
+            List<Point> inImgFileCenters,
+            List<double> inImgFileRadiuses,
             ObservableCollection<int> inAliasSelection)
         {
             for (int i = 0; i < 3; i++)
@@ -149,11 +178,11 @@ namespace ImageMarker
                     _toBeMarkedImages[_nextImageIndex - 1].UsedMarkings[i].Alias =
                        inAliasSelection[i];
                     _toBeMarkedImages[_nextImageIndex - 1].UsedMarkings[i].FeaturePosition.x =
-                       inFindableLeft[i];
+                       inImgFileCenters[i].X;
                     _toBeMarkedImages[_nextImageIndex - 1].UsedMarkings[i].FeaturePosition.y =
-                       inFindableTop[i];
+                       inImgFileCenters[i].Y;
                     _toBeMarkedImages[_nextImageIndex - 1].UsedMarkings[i].FeaturePosition.Radius =
-                       inFindableWidthHeight[i];
+                       inImgFileRadiuses[i];
                 }
             }
         }

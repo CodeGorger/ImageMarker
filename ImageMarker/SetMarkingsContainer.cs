@@ -222,6 +222,12 @@ namespace ImageMarker
         }
 
 
+        public BitmapImageSuccessDto GetCurrentFileImgMarkingsDto()
+        {
+            return Markings.GetCurrentFileImgMarkingsDto();
+        }
+
+
         public BitmapImageSuccessDto LoadNextImage()
         {
             if (!_isLoaded)
@@ -233,16 +239,14 @@ namespace ImageMarker
         }
         public void StoreMarkings(
             ObservableCollection<bool> inIsUsedFindable,
-            ObservableCollection<double> inFindableLeft,
-            ObservableCollection<double> inFindableTop,
-            ObservableCollection<double> inFindableWidthHeight,
+            List<Point> inImgFileCenters,
+            List<double> inImgFileRadiuses,
             ObservableCollection<int> inAliasSelection)
         {
             Markings.StoreMarkings(
                 inIsUsedFindable,
-                inFindableLeft,
-                inFindableTop,
-                inFindableWidthHeight,
+                inImgFileCenters,
+                inImgFileRadiuses,
                 inAliasSelection);
         }
 

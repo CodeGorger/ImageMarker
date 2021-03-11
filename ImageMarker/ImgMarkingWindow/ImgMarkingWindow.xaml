@@ -4,7 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageMarker"
+        xmlns:pb="clr-namespace:PushBindingExtension"
         mc:Ignorable="d"
+        SizeChanged="OnSizeChanged"
         Loaded="OnLoad"
         Closing="OnClosing"
         Title="ImgMarkingWindow" Height="450" Width="800"
@@ -44,14 +46,17 @@
                                 Viewport="0,0,10,10" 
                                 ViewportUnits="Absolute" />
                 </Grid.Background>
-     
+
                 <Image 
                     Name="MainImageView"
                     Source="{Binding Path=CurrentImage}"
                     MouseMove="MouseMoveOnImageView"
-                    MouseLeftButtonDown="MouseLeftButtonDownOnImageView"
-                    />
-                
+                    MouseLeftButtonDown="MouseLeftButtonDownOnImageView">
+                    <pb:PushBindingManager.PushBindings>
+                        <pb:PushBinding TargetProperty="ActualHeight" Path="UiImageHeight"/>
+                        <pb:PushBinding TargetProperty="ActualWidth" Path="UiImageWidth"/>
+                    </pb:PushBindingManager.PushBindings>
+                </Image>
                 <Canvas Height="{Binding ActualHeight,ElementName=MainImageView}"
                         Width="{Binding ActualWidth,ElementName=MainImageView}">
 					<Ellipse

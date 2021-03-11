@@ -24,6 +24,16 @@ namespace ImageMarker
             _allSetMarkingsContainers = inSetMarkingsContainerList;
         }
 
+
+        public BitmapImageSuccessDto GetCurrentFileImgMarkingsDto()
+        {
+            BitmapImageSuccessDto ret =
+                _allSetMarkingsContainers[_currentSetIndex].GetCurrentFileImgMarkingsDto();
+            ret.DirNoOf = (_currentSetIndex + 1).ToString() +
+                "/" + _allSetMarkingsContainers.Count.ToString();
+            return ret;
+        }
+
         public BitmapImageSuccessDto LoadNextImage()
         {
             // This entire algo may only be execute if not at the end
@@ -54,7 +64,7 @@ namespace ImageMarker
             }
             BitmapImageSuccessDto ret =
                 _allSetMarkingsContainers[_currentSetIndex].LoadNextImage();
-            ret.DirNoOf= (_currentSetIndex+1).ToString() + 
+            ret.DirNoOf = (_currentSetIndex+1).ToString() + 
                 "/" + _allSetMarkingsContainers.Count.ToString();
             return ret;
         }
@@ -62,9 +72,8 @@ namespace ImageMarker
 
         public void StoreMarkings(
             ObservableCollection<bool> inIsUsedFindable,
-            ObservableCollection<double> inFindableLeft,
-            ObservableCollection<double> inFindableTop,
-            ObservableCollection<double> inFindableWidthHeight,
+            List<Point> inImgFileCenters,
+            List<double> inImgFileRadiuses,
             ObservableCollection<int> inAliasSelection)
         {
             if(_currentSetIndex>=_allSetMarkingsContainers.Count)
@@ -73,9 +82,8 @@ namespace ImageMarker
             }
             _allSetMarkingsContainers[_currentSetIndex].StoreMarkings(
                 inIsUsedFindable,
-                inFindableLeft,
-                inFindableTop,
-                inFindableWidthHeight,
+                inImgFileCenters,
+                inImgFileRadiuses,
                 inAliasSelection);
         }
 

@@ -12,50 +12,50 @@ namespace ImageMarker
 {
     public partial class ImgMarkingWindowViewModel
     {
-        private ObservableCollection<Point> findableCenter =
+        private ObservableCollection<Point> _findableCenter =
             new ObservableCollection<Point>()
                 { new Point(0,0), new Point(0,0), new Point(0,0) };
         //TODO(Simon): Magic 'number' for findables, 3 entries ... 
 
 
-        private ObservableCollection<double> findableLeft =
+        private ObservableCollection<double> _findableLeft =
             new ObservableCollection<double>()
                 { 0, 0, 0 };
         //TODO(Simon): Magic 'number' for findables, 3 entries ... 
         public ObservableCollection<double> FindableLeft
         {
-            get => findableLeft;
+            get => _findableLeft;
             set
             {
-                findableLeft = value;
+                _findableLeft = value;
                 OnPropertyChanged(nameof(FindableLeft));
             }
         }
 
-        private ObservableCollection<double> findableTop = 
+        private ObservableCollection<double> _findableTop =
             new ObservableCollection<double>()
                 { 0, 0, 0 };
         //TODO(Simon): Magic 'number' for findables, 3 entries ... 
         public ObservableCollection<double> FindableTop
         {
-            get => findableTop;
+            get => _findableTop;
             set
             {
-                findableTop = value;
+                _findableTop = value;
                 OnPropertyChanged(nameof(FindableTop));
             }
         }
 
-        private ObservableCollection<double> findableWidthHeight
+        private ObservableCollection<double> _findableWidthHeight
             = new ObservableCollection<double>()
                 { 0, 0, 0 };
         //TODO(Simon): Magic 'number' for findables, 3 entries ... 
         public ObservableCollection<double> FindableWidthHeight
         {
-            get => findableWidthHeight;
+            get => _findableWidthHeight;
             set
             {
-                findableWidthHeight = value;
+                _findableWidthHeight = value;
                 OnPropertyChanged(nameof(FindableWidthHeight));
             }
         }
@@ -172,7 +172,7 @@ namespace ImageMarker
                 OnPropertyChanged(nameof(CurrentImage));
             }
         }
-        
+
         private const int slimeBorder = 2;
         private const int thickBorder = 5;
         private ObservableCollection<int> _findableBorderThickness =
@@ -197,6 +197,46 @@ namespace ImageMarker
             {
                 cursorPosition = value;
                 OnPropertyChanged(nameof(CursorPosition));
+            }
+        }
+
+        private double _uiImageWidth;
+        public double UiImageWidth
+        {
+            get => _uiImageWidth;
+            set
+            {
+                _uiImageWidth = value;
+            }
+        }
+
+        private double _uiImageHeight;
+        public double UiImageHeight
+        {
+            get => _uiImageHeight;
+            set
+            {
+                _uiImageHeight = value;
+            }
+        }
+
+        private double _fileImageWidth;
+        public double FileImageWidth
+        {
+            get => _fileImageWidth;
+            set
+            {
+                _fileImageWidth = value;
+            }
+        }
+
+        private double _fileImageHeight;
+        public double FileImageHeight
+        {
+            get => _fileImageHeight;
+            set
+            {
+                _fileImageHeight = value;
             }
         }
     }

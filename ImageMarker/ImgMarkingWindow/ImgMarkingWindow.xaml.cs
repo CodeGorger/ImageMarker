@@ -19,6 +19,7 @@ using ImageMarker.ImageEntity;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Timers;
 
 namespace ImageMarker
 {
@@ -27,19 +28,42 @@ namespace ImageMarker
     /// </summary>
     public partial class ImgMarkingWindow : Window
     {
+        Timer _resizeTimer = new Timer(100) { Enabled = false };
+
         ImgMarkingWindowViewModel _vm;
         public ImgMarkingWindow(ImgMarkingWindowViewModel inVM)
         {
             InitializeComponent();
             _vm = inVM;
             this.DataContext = _vm;
+            _resizeTimer.Elapsed += new ElapsedEventHandler(ResizingDone);
         }
 
+        private void OnSizeChanged(object sender, RoutedEventArgs e)
+        {
+            if (!_finishedLoading)
+            {
+                return;
+            }
+            _vm.FileImageWidth = _vm.CurrentImage.Width;
+            _vm.FileImageHeight = _vm.CurrentImage.Height;
+            _vm.PurgeStickRadius();
+            _resizeTimer.Stop();
+            _resizeTimer.Start();
+        }
+        void ResizingDone(object sender, ElapsedEventArgs e)
+        {
+            _resizeTimer.Stop();
+            _vm.ResizingDone();
+        }
+
+        private bool _finishedLoading=false;
         // OnLoad is trigged when show() was called
         private void OnLoad(object sender, RoutedEventArgs e)
         {
             _vm.SetSelectFindable(0);
             _vm.LoadNextImage();
+            _finishedLoading = true;
         }
 
         private void OnClosing(object sender, CancelEventArgs e)
@@ -54,16 +78,18 @@ namespace ImageMarker
             {
                 this.Title = "You pressed F5";
             }
+            if (e.Key == Key.Escape)
+            {
+                _vm.PurgeStickRadius();
+            }
         }
 
         private void MouseMoveOnImageView(object sender, MouseEventArgs e)
         {
             UIElement s = e.Source as UIElement;
-            Image tmpImage = ((Image)s);
             Point pos = e.GetPosition(s);
 
-            _vm.WriteCursorPositionStatus(pos, tmpImage);
-
+            _vm.WriteCursorPositionStatus(pos);
             _vm.HandleRadiusDetermining(pos);
         }
 
@@ -72,15 +98,16 @@ namespace ImageMarker
         {
             //SelectionFindable
             UIElement s = e.Source as UIElement;
-            Image tmpImage = ((Image)s);
             Point pos = e.GetPosition(s);
 
             _vm.ImageViewClick(pos);
         }
+
         private void Button_Click_Next(object sender, RoutedEventArgs e)
         {
             _vm.ClickNext();
         }
+
         public void MouseDown_Findable1(object sender, MouseButtonEventArgs e)
         {
             _vm.SetSelectFindable(0);
