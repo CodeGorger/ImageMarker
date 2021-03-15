@@ -15,21 +15,21 @@
     <Window.Resources>
         <local:BoolToVisibility x:Key="visiConverter" />
     </Window.Resources>
-    
+
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" Height="26">
-          <StatusBarItem>
-            <TextBlock Text="{Binding Path=CursorPosition}" />
-          </StatusBarItem>
-          <StatusBarItem>
-            <TextBlock Text="{Binding Path=CurrentDirectoryOf}" />
-          </StatusBarItem>
-          <StatusBarItem>
-            <TextBlock Text="{Binding Path=CurrentImageOf}" />
-          </StatusBarItem>
-          <StatusBarItem>
-            <TextBlock Text="{Binding Path=CurrentImageName}" />
-          </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=CursorPosition}" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=CurrentDirectoryOf}" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=CurrentImageOf}" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=CurrentImageName}" />
+            </StatusBarItem>
         </StatusBar>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -46,20 +46,20 @@
                                 Viewport="0,0,10,10" 
                                 ViewportUnits="Absolute" />
                 </Grid.Background>
+                <pb:PushBindingManager.PushBindings>
+                    <pb:PushBinding TargetProperty="ActualHeight" Path="UiImageHeight"/>
+                    <pb:PushBinding TargetProperty="ActualWidth" Path="UiImageWidth"/>
+                </pb:PushBindingManager.PushBindings>
 
                 <Image 
                     Name="MainImageView"
                     Source="{Binding Path=CurrentImage}"
                     MouseMove="MouseMoveOnImageView"
                     MouseLeftButtonDown="MouseLeftButtonDownOnImageView">
-                    <pb:PushBindingManager.PushBindings>
-                        <pb:PushBinding TargetProperty="ActualHeight" Path="UiImageHeight"/>
-                        <pb:PushBinding TargetProperty="ActualWidth" Path="UiImageWidth"/>
-                    </pb:PushBindingManager.PushBindings>
                 </Image>
                 <Canvas Height="{Binding ActualHeight,ElementName=MainImageView}"
                         Width="{Binding ActualWidth,ElementName=MainImageView}">
-					<Ellipse
+                    <Ellipse
                         Width="{Binding Path=FindableWidthHeight[0]}"
                         Height="{Binding Path=FindableWidthHeight[0]}"
                         Stroke="Blue"
@@ -68,7 +68,7 @@
                         IsHitTestVisible="False"
                         Canvas.Left="{Binding Path=FindableLeft[0]}"
                         Canvas.Top="{Binding Path=FindableTop[0]}"  />
-					<Ellipse
+                    <Ellipse
                         Width="{Binding Path=FindableWidthHeight[1]}"
                         Height="{Binding Path=FindableWidthHeight[1]}"
                         Stroke="ForestGreen"
@@ -77,7 +77,7 @@
                         IsHitTestVisible="False"
                         Canvas.Left="{Binding Path=FindableLeft[1]}"
                         Canvas.Top="{Binding Path=FindableTop[1]}"/>
-					<Ellipse
+                    <Ellipse
                         Width="{Binding Path=FindableWidthHeight[2]}"
                         Height="{Binding Path=FindableWidthHeight[2]}"
                         Stroke="IndianRed"

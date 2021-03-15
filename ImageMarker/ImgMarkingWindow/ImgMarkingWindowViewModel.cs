@@ -37,7 +37,7 @@ namespace ImageMarker
             OnPropertyChanged(nameof(AliasSelection));
         }
 
-        private void _applyImgDtoToUi(BitmapImageSuccessDto inImgDto)
+        private void _applyImgDtoToUi(BitmapImageSuccessDto inImgDto, double inUiToFileRatio)
         {
             if (inImgDto.Img != null)
             {
@@ -47,41 +47,61 @@ namespace ImageMarker
             CurrentDirectoryOf = inImgDto.DirNoOf;
             CurrentImageName = inImgDto.ImageName;
 
-            ObservableCollection<double> tmpFindableLeft = 
+            ObservableCollection<double> tmpFindableLeft =
                 new ObservableCollection<double>();
-            ObservableCollection<double> tmpFindableTop = 
+            ObservableCollection<double> tmpFindableTop =
                 new ObservableCollection<double>();
-            double ratio = UiImageWidth / FileImageWidth;
-            for (int i=0;i<3;i++)
+            for (int i = 0; i < 3; i++)
             {
                 double radius = inImgDto.FileImageRadiuses[i];
-                tmpFindableLeft.Add(inImgDto.FileImageCenters[i].X * ratio - radius * ratio);
-                tmpFindableTop.Add(inImgDto.FileImageCenters[i].Y * ratio - radius * ratio);
+                tmpFindableLeft.Add(inImgDto.FileImageCenters[i].X * inUiToFileRatio - radius * inUiToFileRatio);
+                tmpFindableTop.Add(inImgDto.FileImageCenters[i].Y * inUiToFileRatio - radius * inUiToFileRatio);
                 _findableCenter[i] = new Point(
-                    inImgDto.FileImageCenters[i].X * ratio,
-                    inImgDto.FileImageCenters[i].Y * ratio);
+                    inImgDto.FileImageCenters[i].X * inUiToFileRatio,
+                    inImgDto.FileImageCenters[i].Y * inUiToFileRatio);
             }
             FindableLeft = tmpFindableLeft;
             FindableTop = tmpFindableTop;
 
             FindableWidthHeight =
                 new ObservableCollection<double>(
-                    inImgDto.FileImageRadiuses.Select(x => x * 2 * ratio)
+                    inImgDto.FileImageRadiuses.Select(x => x * 2 * inUiToFileRatio)
                     .ToList());
             IsUsedFindable =
                 new ObservableCollection<bool>(inImgDto.KnownMarkings);
 
         }
 
+        private double _getUiToFileSizeRatio(double inFileWidth, double inFileHeight)
+        {
+            double ratioUiToFileSize = 0;
+            double frameRatio = UiImageWidth / UiImageHeight;
+            double fileRatio = inFileWidth / inFileHeight;
+
+            // First find limiting dimension
+            if (frameRatio > fileRatio)
+            {
+                ratioUiToFileSize = UiImageHeight / inFileHeight;
+            }
+            else
+            {
+                ratioUiToFileSize = UiImageWidth / inFileWidth;
+            }
+
+            return ratioUiToFileSize;
+        }
+
+
         public void LoadNextImage()
         {
-            BitmapImageSuccessDto imgDto = 
+            BitmapImageSuccessDto imgDto =
                 _globalMarkingsManager.LoadNextImage();
-            if(imgDto.Success)
+            if (imgDto.Success)
             {
-                _applyImgDtoToUi(imgDto);
+                double ratio = _getUiToFileSizeRatio(imgDto.Img.Width, imgDto.Img.Height);
+                _applyImgDtoToUi(imgDto, ratio);
             }
-            else if(imgDto.LastDirFinished)
+            else if (imgDto.LastDirFinished)
             {
                 //TODO(Simon): Don't do this, arghhhh
                 Application.Current.Shutdown();
@@ -92,8 +112,8 @@ namespace ImageMarker
             }
         }
 
-        
-        private Point _getFilePointFromUIPoint(Point inPos, bool inMirrorHorizontal=false)
+
+        private Point _getFilePointFromUIPoint(Point inPos, bool inMirrorHorizontal = false)
         {
             int xScreen = ((int)inPos.X);
             int yScreen;
@@ -174,9 +194,18 @@ namespace ImageMarker
 
         public void ResizingDone()
         {
-            BitmapImageSuccessDto inImgDto =
+            BitmapImageSuccessDto imgDto =
                 _globalMarkingsManager.GetCurrentFileImgMarkingsDto();
-            _applyImgDtoToUi(inImgDto);
+            double ratio = 0;
+            if (imgDto.Img != null)
+            {
+                ratio = _getUiToFileSizeRatio(imgDto.Img.Width, imgDto.Img.Height);
+            }
+            else
+            {
+                ratio = _getUiToFileSizeRatio(FileImageWidth, FileImageHeight);
+            }
+            _applyImgDtoToUi(imgDto, ratio);
         }
 
 
@@ -227,9 +256,9 @@ namespace ImageMarker
             if (hasStickyRadius)
             {
                 double radius = _distanceToCenter(inPos);
-                FindableLeft[SelectionFindable] = 
+                FindableLeft[SelectionFindable] =
                     _getLeft(_findableCenter[SelectionFindable], radius);
-                FindableTop[SelectionFindable] = 
+                FindableTop[SelectionFindable] =
                     _getTop(_findableCenter[SelectionFindable], radius);
                 FindableWidthHeight[SelectionFindable] = radius * 2;
             }
