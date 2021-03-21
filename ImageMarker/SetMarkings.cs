@@ -76,12 +76,17 @@ namespace ImageMarker
             return ((_nextImageIndex) < _toBeMarkedImages.Count);
         }
 
-        private BitmapImage _loadTheImage()
+        public bool HasPrevImage()
+        {
+            return (_nextImageIndex > 1);
+        }
+
+        private BitmapImage _loadTheImage(int inImgId)
         {
             BitmapImage ret = new BitmapImage();
 
             String pathToImage = System.IO.Path.GetFullPath(
-                _toBeMarkedImages[_nextImageIndex].Path);
+                _toBeMarkedImages[inImgId].Path);
 
             ret.BeginInit();
             ret.UriSource = new Uri(pathToImage);
@@ -93,21 +98,22 @@ namespace ImageMarker
 
         private void _copyMarkings(
             ref BitmapImageSuccessDto inDestDto,
-            int inId)
+            int inId,
+            int inImgId)
         {
             inDestDto.KnownMarkings[inId] =
-                _toBeMarkedImages[_nextImageIndex].UsedMarkings[inId].IsUsed;
-            if (_toBeMarkedImages[_nextImageIndex].UsedMarkings[inId].IsUsed)
+                _toBeMarkedImages[inImgId].UsedMarkings[inId].IsUsed;
+            if (_toBeMarkedImages[inImgId].UsedMarkings[inId].IsUsed)
             {
                 inDestDto.FileImageCenters[inId] = new Point(
-                    _toBeMarkedImages[_nextImageIndex].
+                    _toBeMarkedImages[inImgId].
                         UsedMarkings[inId].FeaturePosition.x,
-                    _toBeMarkedImages[_nextImageIndex].
+                    _toBeMarkedImages[inImgId].
                         UsedMarkings[inId].FeaturePosition.y
                     );
                     
                 inDestDto.FileImageRadiuses[inId] =
-                    _toBeMarkedImages[_nextImageIndex].
+                    _toBeMarkedImages[inImgId].
                     UsedMarkings[inId].FeaturePosition.Radius;
             }
         }
@@ -120,11 +126,11 @@ namespace ImageMarker
                 return ret;
             }
 
-            _copyMarkings(ref ret, 0);
-            _copyMarkings(ref ret, 1);
-            _copyMarkings(ref ret, 2);
+            _copyMarkings(ref ret, 0, _nextImageIndex);
+            _copyMarkings(ref ret, 1, _nextImageIndex);
+            _copyMarkings(ref ret, 2, _nextImageIndex);
             
-            ret.Img = _loadTheImage();
+            ret.Img = _loadTheImage(_nextImageIndex);
             ret.ImgNoOf =   (_nextImageIndex + 1) + 
                             " / " + 
                             _toBeMarkedImages.Count;
@@ -137,6 +143,31 @@ namespace ImageMarker
         }
 
 
+        public BitmapImageSuccessDto LoadPrevImage()
+        {
+            BitmapImageSuccessDto ret = new BitmapImageSuccessDto();
+            if (!HasPrevImage())
+            {
+                return ret;
+            }
+
+            _copyMarkings(ref ret, 0, _nextImageIndex - 2);
+            _copyMarkings(ref ret, 1, _nextImageIndex - 2);
+            _copyMarkings(ref ret, 2, _nextImageIndex - 2);
+
+            ret.Img = _loadTheImage(_nextImageIndex - 2);
+            ret.ImgNoOf = (_nextImageIndex - 1) +
+                            " / " +
+                            _toBeMarkedImages.Count;
+            ret.ImageName = _toBeMarkedImages[_nextImageIndex - 2].FileName;
+
+            ret.Success = true;
+            _nextImageIndex--;
+
+            return ret;
+        }
+       
+
         public BitmapImageSuccessDto GetCurrentFileImgMarkingsDto()
         {
             _nextImageIndex--;
@@ -146,9 +177,9 @@ namespace ImageMarker
                 return ret;
             }
 
-            _copyMarkings(ref ret, 0);
-            _copyMarkings(ref ret, 1);
-            _copyMarkings(ref ret, 2);
+            _copyMarkings(ref ret, 0, _nextImageIndex);
+            _copyMarkings(ref ret, 1, _nextImageIndex);
+            _copyMarkings(ref ret, 2, _nextImageIndex);
 
             ret.Img = null;
             ret.ImgNoOf = (_nextImageIndex + 1) +
@@ -187,5 +218,9 @@ namespace ImageMarker
             }
         }
 
+        public void SetNextImageIndexToLast()
+        {
+            _nextImageIndex = _toBeMarkedImages.Count+1;
+        }
     }
 }

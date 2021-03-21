@@ -27,7 +27,9 @@
                             Mode=FindAncestor, 
                             AncestorType={x:Type local:FindableEntityGui}},
                         Path=IsUsed, 
-                        Mode=TwoWay}"/>
+                        Mode=TwoWay}"
+                      Focusable="False"
+                      />
 
             <Label Grid.Column="0" Grid.Row="1" Margin="0" Padding="0">Alias</Label>
             <ComboBox Grid.Column="1" Grid.Row="1" Margin="0" Padding="0" Name="ComboBoxAlias" 
@@ -43,6 +45,7 @@
                             AncestorType={x:Type local:FindableEntityGui}},
                         Path=AliasItem, 
                         Mode=TwoWay}"
+                      Focusable="False"
                       />
 
             <Label Grid.Column="0" Grid.Row="2" Margin="0" Padding="0">Circle</Label>

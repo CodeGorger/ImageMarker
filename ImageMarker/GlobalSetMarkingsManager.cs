@@ -45,7 +45,7 @@ namespace ImageMarker
             }
 
             // Cycle through the sets without any images until one is found.
-            while (!_allSetMarkingsContainers[_currentSetIndex].HasNextImage())
+                while (!_allSetMarkingsContainers[_currentSetIndex].HasNextImage())
             {
                 // Delete temp archive folder, serialize markings
                 // and remove markings from memory
@@ -67,6 +67,53 @@ namespace ImageMarker
             ret.DirNoOf = (_currentSetIndex+1).ToString() + 
                 "/" + _allSetMarkingsContainers.Count.ToString();
             return ret;
+        }
+
+
+        public BitmapImageSuccessDto LoadPrevImage()
+        {
+            // This entire algo may only be execute if not at the end
+            if (_currentSetIndex < 0)
+            {
+                BitmapImageSuccessDto retLast = new BitmapImageSuccessDto();
+                retLast.LastDirFinished = true;
+                return retLast;
+            }
+
+            // Cycle through the sets without any images until one is found.
+            while (!_allSetMarkingsContainers[_currentSetIndex].HasPrevImage())
+            {
+                if (_currentSetIndex > 0)
+                {
+                    // Delete temp archive folder, serialize markings
+                    // and remove markings from memory
+                    _allSetMarkingsContainers[_currentSetIndex].Cleanup();
+                }
+
+                _currentSetIndex--;
+                // If the new current does exist because 
+                // the prev was the last one
+                if (_currentSetIndex < 0)
+                {
+                    _currentSetIndex = 0;
+                    BitmapImageSuccessDto retLast = new BitmapImageSuccessDto();
+                    retLast.LastDirFinished = true;
+                    return retLast;
+                }
+
+            }
+            BitmapImageSuccessDto ret =
+                _allSetMarkingsContainers[_currentSetIndex].LoadPrevImage();
+            ret.DirNoOf = (_currentSetIndex + 1).ToString() +
+                "/" + _allSetMarkingsContainers.Count.ToString();
+            return ret;
+
+        }
+
+
+        public string GetCurrentDir()
+        {
+            return _allSetMarkingsContainers[_currentSetIndex].GetPath();
         }
 
 

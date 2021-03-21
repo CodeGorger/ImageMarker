@@ -107,6 +107,17 @@ namespace ImageMarker
             }
         }
 
+        private string _currentDir;
+        public string CurrentDir
+        {
+            get => " | " + _currentDir;
+            set
+            {
+                _currentDir = value;
+                OnPropertyChanged(nameof(CurrentDir));
+            }
+        }
+
         private ObservableCollection<string> _aliasEncodingSetting;
         public ObservableCollection<string> AliasEncodingSetting
         {

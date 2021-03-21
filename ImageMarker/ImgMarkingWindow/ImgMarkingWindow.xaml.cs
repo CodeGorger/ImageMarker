@@ -82,6 +82,30 @@ namespace ImageMarker
             {
                 _vm.PurgeStickRadius();
             }
+            if (e.Key == Key.Space)
+            {
+                _vm.ClickNext();
+            }
+            if (e.Key == Key.D1)
+            {
+                _vm.SetSelectFindable(0);
+            }
+            if (e.Key == Key.D2)
+            {
+                _vm.SetSelectFindable(1);
+            }
+            if (e.Key == Key.D3)
+            {
+                _vm.SetSelectFindable(2);
+            }
+            if (e.Key == Key.Left)
+            {
+                _vm.ClickBack();
+            }
+            if (e.Key == Key.Right)
+            {
+                _vm.ClickNext();
+            }
         }
 
         private void MouseMoveOnImageView(object sender, MouseEventArgs e)

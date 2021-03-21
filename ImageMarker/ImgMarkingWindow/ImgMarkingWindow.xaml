@@ -30,6 +30,9 @@
             <StatusBarItem>
                 <TextBlock Text="{Binding Path=CurrentImageName}" />
             </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=CurrentDir}" />
+            </StatusBarItem>
         </StatusBar>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -131,8 +134,10 @@
                         />
                 </Grid>
                 <Button Grid.Row="1" 
+                        Name="NextButton"
                         Content="{Binding Path=NextStringButtonCaption}" 
                         Click="Button_Click_Next" 
+                        Focusable="False"
                         />
             </Grid>
         </Grid>

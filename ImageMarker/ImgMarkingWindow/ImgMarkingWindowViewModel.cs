@@ -21,7 +21,6 @@ namespace ImageMarker
         {
         }
 
-
         public void SetData(GlobalSetMarkingsManager inMarkingsManager)
         {
             _globalMarkingsManager = inMarkingsManager;
@@ -91,6 +90,17 @@ namespace ImageMarker
             return ratioUiToFileSize;
         }
 
+        public void LoadPrevImage()
+        {
+            BitmapImageSuccessDto imgDto =
+                _globalMarkingsManager.LoadPrevImage();
+            if (imgDto.Success)
+            {
+                double ratio = _getUiToFileSizeRatio(imgDto.Img.Width, imgDto.Img.Height);
+                _applyImgDtoToUi(imgDto, ratio);
+                CurrentDir = _globalMarkingsManager.GetCurrentDir();
+            }
+        }
 
         public void LoadNextImage()
         {
@@ -100,6 +110,7 @@ namespace ImageMarker
             {
                 double ratio = _getUiToFileSizeRatio(imgDto.Img.Width, imgDto.Img.Height);
                 _applyImgDtoToUi(imgDto, ratio);
+                CurrentDir=_globalMarkingsManager.GetCurrentDir();
             }
             else if (imgDto.LastDirFinished)
             {
@@ -125,10 +136,9 @@ namespace ImageMarker
             {
                 yScreen = (int)inPos.Y;
             }
-            double xRatio = ((double)xScreen) / UiImageWidth;
-            double yRatio = ((double)yScreen) / UiImageHeight;
-            double imgX = xRatio * CurrentImage.Width;
-            double imgY = yRatio * CurrentImage.Height;
+            double ratio = _getUiToFileSizeRatio(CurrentImage.Width, CurrentImage.Height);
+            double imgX = ((double)xScreen) / ratio;
+            double imgY = ((double)yScreen) / ratio;
             return new Point(imgX, imgY);
         }
 
@@ -189,6 +199,16 @@ namespace ImageMarker
             hasStickyRadius = false;
 
             LoadNextImage();
+        }
+
+        public void ClickBack()
+        {
+            //_storeMarkingstoMarkings();
+
+            SelectionFindable = 0;
+            hasStickyRadius = false;
+
+            LoadPrevImage();
         }
 
 

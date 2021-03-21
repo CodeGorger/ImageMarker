@@ -39,6 +39,11 @@ namespace ImageMarker
         {
             _path = inPath;
         }
+        public string GetPath()
+        {
+            return _path;
+        }
+        
 
         private bool _isArchive;
         public void SetIsArchive(bool inIsArchive)
@@ -190,7 +195,7 @@ namespace ImageMarker
         }
 
 
-        private void _loadSetMarkingsContainer()
+        private void _loadSetMarkingsContainer(bool inIsPrevLoad=false)
         {
             if (_hasMarkingsFile)
             {
@@ -207,6 +212,11 @@ namespace ImageMarker
             }
 
             Markings.setMergeImageList(_loadFileList());
+
+            if(inIsPrevLoad)
+            {
+                Markings.SetNextImageIndexToLast();
+            }
         }
 
 
@@ -219,6 +229,16 @@ namespace ImageMarker
             }
 
             return Markings.HasNextImage();
+        }
+        public bool HasPrevImage()
+        {
+            if (!_isLoaded)
+            {
+                _loadSetMarkingsContainer(true);
+                _isLoaded = true;
+            }
+
+            return Markings.HasPrevImage();
         }
 
 
@@ -237,6 +257,18 @@ namespace ImageMarker
             }
             return Markings.LoadNextImage();
         }
+
+        public BitmapImageSuccessDto LoadPrevImage()
+        {
+            if (!_isLoaded)
+            {
+                _loadSetMarkingsContainer();
+                _isLoaded = true;
+            }
+            return Markings.LoadPrevImage();
+        }
+
+
         public void StoreMarkings(
             ObservableCollection<bool> inIsUsedFindable,
             List<Point> inImgFileCenters,
@@ -263,6 +295,8 @@ namespace ImageMarker
 
             // remove markings from memory
             Markings = null;
+
+            _isLoaded = false;
         }
     }
 }
