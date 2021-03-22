@@ -13,56 +13,64 @@
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="1" >
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Button Grid.Row="0" 
-                    Command="{Binding SetMainPathCommand}" 
-                    Content="{Binding SetSpawnButtonText}"/>
-            <Button Grid.Row="1" 
-                    Command="{Binding SetAliasesCommand}" 
-                    Content="{Binding SetAliasEncodingButtonText}"/>
-            <Button Grid.Row="2" 
-                    Command="{Binding StartMarkingCommand}">Start</Button>
 
-            <!--<Button Grid.Row="2" Click="Button_Click_Start">Start</Button>-->
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom" Height="26">
+            <StatusBarItem>
+                <TextBlock Text="{Binding Path=StatusSettingSpawn}" />
+            </StatusBarItem>
+        </StatusBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="1" >
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" 
+                        Command="{Binding SetMainPathCommand}" 
+                        Content="{Binding SetSpawnButtonText}"/>
+                <Button Grid.Row="1" 
+                        Command="{Binding SetAliasesCommand}" 
+                        Content="{Binding SetAliasEncodingButtonText}"/>
+                <Button Grid.Row="2" 
+                        Command="{Binding StartMarkingCommand}">Start</Button>
+
+                <!--<Button Grid.Row="2" Click="Button_Click_Start">Start</Button>-->
+            </Grid>
+
+            <TreeView Grid.Column="0"
+                      ItemsSource="{Binding Path=Environment_TreeView_ItemsSource}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate
+                        ItemsSource="{Binding SubDirectories}" 
+                        DataType="local:EnvironmentDirectory">
+                        <StackPanel Orientation="Horizontal">
+                            <Image 
+                                Width="16" Height="16"
+                                Source="/Images/markerYes.png" 
+                                Visibility="{Binding 
+                                    MarkingsFileFound, 
+                                    Converter={StaticResource visiConverter}}" />
+                            <Image 
+                                Width="16" Height="16"
+                                Source="/Images/markerNo.png" 
+                                Visibility="{Binding
+                                    MarkingsFileNotFound, 
+                                    Converter={StaticResource visiConverter}}" />
+                            <CheckBox 
+                                IsChecked="{Binding MarkingRoutineWillRunOn}" 
+                                Content="{Binding LastDirOrArchiveName}"/>
+
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <!--<Button Grid.Column="1" Click="Button_Click">Start Marking</Button>-->
         </Grid>
-
-        <TreeView Grid.Column="0"
-                  ItemsSource="{Binding Path=Environment_TreeView_ItemsSource}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate
-                    ItemsSource="{Binding SubDirectories}" 
-                    DataType="local:EnvironmentDirectory">
-                    <StackPanel Orientation="Horizontal">
-                        <Image 
-                            Width="16" Height="16"
-                            Source="/Images/markerYes.png" 
-                            Visibility="{Binding 
-                                MarkingsFileFound, 
-                                Converter={StaticResource visiConverter}}" />
-                        <Image 
-                            Width="16" Height="16"
-                            Source="/Images/markerNo.png" 
-                            Visibility="{Binding
-                                MarkingsFileNotFound, 
-                                Converter={StaticResource visiConverter}}" />
-                        <CheckBox 
-                            IsChecked="{Binding MarkingRoutineWillRunOn}" 
-                            Content="{Binding LastDirOrArchiveName}"/>
-
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-        <!--<Button Grid.Column="1" Click="Button_Click">Start Marking</Button>-->
-    </Grid>
+    </DockPanel>
 </Window>

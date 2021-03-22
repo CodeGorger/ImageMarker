@@ -22,6 +22,19 @@ namespace ImageMarker
             }
         }
 
+        private int _loadingStatusInt=1;
+
+        private string _statusSettingSpawn = "";
+        public string StatusSettingSpawn
+        {
+            get => _statusSettingSpawn;
+            set
+            {
+                _statusSettingSpawn = value;
+                OnPropertyChanged(nameof(StatusSettingSpawn));
+            }
+        }
+
         private ObservableCollection<EnvironmentDirectory> _environment_TreeView_ItemsSource;
         public ObservableCollection<EnvironmentDirectory> Environment_TreeView_ItemsSource
         {

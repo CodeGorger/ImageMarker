@@ -3,6 +3,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,8 +52,10 @@ namespace ImageMarker
         }
 
         private ObservableCollection<EnvironmentDirectory> initTree(
-            string inSpawningDir)
+            string inSpawningDir,
+            BackgroundWorker inSender = null)
         {
+            EnvironmentDirectory.StaticBackgroundWorker = inSender;
             EnvironmentDirectory root = new EnvironmentDirectory(inSpawningDir);
             ObservableCollection<EnvironmentDirectory> tmpTree;
             tmpTree = new ObservableCollection<EnvironmentDirectory>();
@@ -62,7 +65,7 @@ namespace ImageMarker
 
 
 
-        private string askForSpawningPoint()
+        public string AskForSpawningPoint()
         {
             var openFolderDialog = new CommonOpenFileDialog();
 
@@ -184,22 +187,13 @@ namespace ImageMarker
             instanceMarkingWindow.Show();
         }
 
-        public MainPathSetDto SetMainPath()
+        public MainPathSetDto SetMainPath(string inPath, BackgroundWorker inSender=null )
         {
-            string tmpMaybePath = askForSpawningPoint();
-
-            if (tmpMaybePath == "")
-            {
-                return new MainPathSetDto();
-            }
-
-            // tmpMaybePath not maybe anymore
-
             MainPathSetDto ret = new MainPathSetDto();
-            ret.FileTree = initTree(tmpMaybePath);
-            ret.SpawnPath = tmpMaybePath;
+            ret.FileTree = initTree(inPath, inSender);
+            ret.SpawnPath = inPath;
             AliasInformationDto tmpEventualAliasI = 
-                checkForAliasesInSpawnDir(tmpMaybePath);
+                checkForAliasesInSpawnDir(inPath);
 
             ret.AliasEncodingFound = tmpEventualAliasI.Initialized;
             if (tmpEventualAliasI.Initialized)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace ImageMarker
     // It can be a node or a leaf
     public partial class EnvironmentDirectory
     {
+
         // The absolute path of the folder or archive.
         private string _pathName = "";
         public string PathName

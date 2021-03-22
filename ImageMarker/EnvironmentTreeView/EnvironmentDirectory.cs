@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -12,6 +13,10 @@ namespace ImageMarker
     // It can be a node or a leaf
     public partial class EnvironmentDirectory : ViewModelBase
     {
+        public static BackgroundWorker StaticBackgroundWorker;
+
+        private static int dirCounter = 0;
+
         // example: inPath == "C:\prog\home\settings"
         // inPathSplit = {"C:","prog","home","settings"}
         // init("C:\prog\home","settings",false)
@@ -29,6 +34,15 @@ namespace ImageMarker
             init(inPath, inName, inIsFile);
         }
 
+        private static void _updateBgWorkerProgress()
+        {
+            dirCounter++;
+            if (dirCounter >= 10)
+            {
+                dirCounter = 0;
+                StaticBackgroundWorker?.ReportProgress(0);
+            }
+        }
 
         public string GetFullPathToMarkingsFile()
         {
@@ -37,6 +51,7 @@ namespace ImageMarker
 
         private void init(string inPath, string inName, bool inIsArchive)
         {
+            _updateBgWorkerProgress();
             _pathName = inPath;
             _lastDirOrArchiveName  = inName;
             _isArchive = inIsArchive;
