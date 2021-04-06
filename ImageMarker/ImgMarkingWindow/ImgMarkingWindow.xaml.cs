@@ -45,8 +45,8 @@ namespace ImageMarker
             {
                 return;
             }
-            _vm.FileImageWidth = _vm.CurrentImage.Width;
-            _vm.FileImageHeight = _vm.CurrentImage.Height;
+            _vm.FileImageWidth = _vm.CurrentImage.PixelWidth;
+            _vm.FileImageHeight = _vm.CurrentImage.PixelHeight;
             _vm.PurgeStickRadius();
             _resizeTimer.Stop();
             _resizeTimer.Start();

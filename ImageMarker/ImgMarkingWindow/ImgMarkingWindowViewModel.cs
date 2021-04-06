@@ -96,7 +96,7 @@ namespace ImageMarker
                 _globalMarkingsManager.LoadPrevImage();
             if (imgDto.Success)
             {
-                double ratio = _getUiToFileSizeRatio(imgDto.Img.Width, imgDto.Img.Height);
+                double ratio = _getUiToFileSizeRatio(imgDto.Img.PixelWidth, imgDto.Img.PixelHeight);
                 _applyImgDtoToUi(imgDto, ratio);
                 CurrentDir = _globalMarkingsManager.GetCurrentDir();
             }
@@ -108,7 +108,7 @@ namespace ImageMarker
                 _globalMarkingsManager.LoadNextImage();
             if (imgDto.Success)
             {
-                double ratio = _getUiToFileSizeRatio(imgDto.Img.Width, imgDto.Img.Height);
+                double ratio = _getUiToFileSizeRatio(imgDto.Img.PixelWidth, imgDto.Img.PixelHeight);
                 _applyImgDtoToUi(imgDto, ratio);
                 CurrentDir=_globalMarkingsManager.GetCurrentDir();
             }
@@ -136,7 +136,7 @@ namespace ImageMarker
             {
                 yScreen = (int)inPos.Y;
             }
-            double ratio = _getUiToFileSizeRatio(CurrentImage.Width, CurrentImage.Height);
+            double ratio = _getUiToFileSizeRatio(CurrentImage.PixelWidth, CurrentImage.PixelHeight);
             double imgX = ((double)xScreen) / ratio;
             double imgY = ((double)yScreen) / ratio;
             return new Point(imgX, imgY);
@@ -145,7 +145,11 @@ namespace ImageMarker
 
         private double _getFileRadius(double inUiRadius)
         {
-            return inUiRadius * CurrentImage.Width / UiImageWidth;
+            double ret;
+            ret = inUiRadius / _getUiToFileSizeRatio(
+                CurrentImage.PixelWidth,
+                CurrentImage.PixelHeight);
+            return ret;
         }
 
 
@@ -219,7 +223,7 @@ namespace ImageMarker
             double ratio = 0;
             if (imgDto.Img != null)
             {
-                ratio = _getUiToFileSizeRatio(imgDto.Img.Width, imgDto.Img.Height);
+                ratio = _getUiToFileSizeRatio(imgDto.Img.PixelWidth, imgDto.Img.PixelHeight);
             }
             else
             {
