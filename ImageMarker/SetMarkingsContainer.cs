@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 
@@ -125,7 +126,22 @@ namespace ImageMarker
             }
 
             string archiveLocation = _path + "\\" + _fullPathFolderOrArchive;
-            ZipFile.ExtractToDirectory(archiveLocation, _archiveUnzipTempDir);
+
+            // Try this, who know what kind of fancy special settings the archive has...
+            try
+            {
+                ZipFile.ExtractToDirectory(archiveLocation, _archiveUnzipTempDir);
+            }
+            catch(Exception e)
+            {
+                // Hard to say all the implication of the try block not working
+                // We'll be optimistic, but still inform the user...
+                System.Windows.Forms.MessageBox.Show(
+                    "Failed to extract "+ archiveLocation +".",
+                    "Exception caught", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+            }
         }
 
 
@@ -157,26 +173,36 @@ namespace ImageMarker
             string inDirectory,
             bool inRecursive)
         {
-            List<ImageEntity.ImageEntity> ret;
+            List<ImageEntity.ImageEntity> ret
+                = new List<ImageEntity.ImageEntity>();
             List<ImageEntity.ImageEntity> all;
-            if (inRecursive)
+            try
             {
-                all = _stringFileListToImageEntityList(
-                    Directory.GetFiles(
-                        inDirectory, 
-                        "*", 
-                        SearchOption.AllDirectories));
-            }
-            else
-            {
-                all = _stringFileListToImageEntityList(
-                    Directory.GetFiles(inDirectory));
-            }
+                if (inRecursive)
+                {
+                        all = _stringFileListToImageEntityList(
+                            Directory.GetFiles(
+                                inDirectory,
+                                "*",
+                                SearchOption.AllDirectories));
+                }
+                else
+                {
+                    all = _stringFileListToImageEntityList(
+                        Directory.GetFiles(inDirectory));
+                }
             ret = new List<ImageEntity.ImageEntity>(
                 all.Where(s =>
                 s.FileName.ToLower().EndsWith(".png") ||
                 s.FileName.ToLower().EndsWith(".jpg") ||
                 s.FileName.ToLower().EndsWith(".jpeg")));
+            }
+            catch (Exception e)
+            {
+                // Maybe the dir couldn't be opened.
+                // It possibly wasn't extracted properly.
+                // Maybe it was deleted, or something unexpected happened.
+            }
             return ret;
         }
 
